@@ -1,16 +1,56 @@
-# This is a sample Python script.
+import pandas as pd
+from figures import ground_truth_xy, ground_truth_subplots, ground_truth_measurements
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+# Parameters
 
 
-# Press the green button in the gutter to run the script.
+data_params = {
+    'paths': {'measurements': 'data/measurements.txt',
+              'controls': 'data/controls.txt',
+              'ground_truth': 'data/ground_truth.txt'
+              },
+    'columns': {'measurements': ['time', 'r', 'phi'],
+                'controls': ['time', 'v', 'omega'],
+                'ground_truth': ['time', 'x', 'y', 'theta']
+                }
+}
+
+
+def load_data(paths, columns):
+    """
+    This function get the data and return it as dict
+
+    :param columns: dict with the columns names for each data
+    :param paths: dict with the data name as key and path as value
+    :return:
+    """
+    data = {}
+
+    for file in paths:
+        data[file] = pd.read_csv(paths[file], names=columns[file])
+
+    return data
+
+
+def plot_figures(ground_truth, measurements):
+
+    # Figure 1
+    # ground_truth_subplots(ground_truth)
+
+    # Figure 2
+    # ground_truth_xy(ground_truth)
+
+    # Figure 3
+    ground_truth_measurements(ground_truth, measurements)
+
+
+def main():
+
+    # Load the data from all files
+    data = load_data(data_params['paths'], data_params['columns'])
+
+    plot_figures(data['ground_truth'], data['measurements'])
+
+
 if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    main()
