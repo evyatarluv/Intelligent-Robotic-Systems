@@ -49,8 +49,8 @@ def ground_truth_measurements(ground_truth, measurements):
     landmark_y = 9
 
     # Move to cartesian coordinates
-    x_meas = [landmark_x + r[i] * np.cos(np.pi / 2 - phi[i]) for i in range(len(r))]
-    y_meas = [landmark_y + r[i] * np.sin(np.pi / 2 - phi[i]) for i in range(len(r))]
+    x_meas = [r[i] * np.cos(np.pi - phi[i] - theta[i]) + landmark_x for i in range(len(r))]
+    y_meas = [r[i] * np.sin(np.pi - phi[i] - theta[i]) + landmark_y for i in range(len(r))]
 
     # Plot
     plt.plot(x_truth, y_truth, color='black')
