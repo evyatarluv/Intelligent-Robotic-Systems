@@ -48,12 +48,17 @@ def ground_truth_measurements(ground_truth, measurements):
     landmark_x = 8
     landmark_y = 9
 
-    # Move to cartesian coordinates
-    x_meas = [r[i] * np.cos(np.pi - phi[i] - theta[i]) + landmark_x for i in range(len(r))]
-    y_meas = [r[i] * np.sin(np.pi - phi[i] - theta[i]) + landmark_y for i in range(len(r))]
+    # Convert from [r, theta] to [x, y] coordinates
+    x_meas = [r[i] * np.cos(np.pi + phi[i] + theta[i]) + landmark_x for i in range(len(r))]
+    y_meas = [r[i] * np.sin(np.pi + phi[i] + theta[i]) + landmark_y for i in range(len(r))]
 
     # Plot
-    plt.plot(x_truth, y_truth, color='black')
-    plt.scatter(x_meas, y_meas, marker='+', color='blue')
+    plt.plot(x_truth, y_truth, color='black', label='Ground Truth')
+    plt.scatter(x_meas, y_meas, marker='+', color='blue', label='Measurements')
+    plt.scatter(landmark_x, landmark_y, marker='X', color='red', linewidths=2, label='Landmark')
+    plt.xlabel('X')
+    plt.ylabel('Y')
+    plt.title('XY Path')
+    plt.legend()
     plt.show()
 
