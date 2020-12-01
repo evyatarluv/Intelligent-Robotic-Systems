@@ -121,11 +121,10 @@ def construct_H(x, y):
 def construct_G(theta, v, omega):
     """
     This function construct the G matrix
-    todo: fill me
-    :param theta:
-    :param v:
-    :param omega:
-    :return:
+    :param theta: theta ori of the robot
+    :param v: velocity control
+    :param omega: omega control
+    :return: ndarray G matrix
     """
 
     dt = kf_params['dt']
@@ -161,10 +160,10 @@ def h_function(x, y, theta):
 
 def g_function(state, control):
     """
-    todo: fill me
-    :param state:
-    :param control:
-    :return: ndarray of the observation
+    This function represent the g non-linear function which describe the state transition.
+    :param state: (t-1) state vector
+    :param control: current control vector
+    :return: new state vector
     """
 
     dt = kf_params['dt']
