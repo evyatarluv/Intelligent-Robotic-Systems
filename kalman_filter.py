@@ -17,7 +17,6 @@ import numpy as np
 
 # Kalman filter parameters
 kf_params = {
-    'A': np.identity(3),
     'variances': {'r': 4, 'phi': 0.07},
     'mu_0': np.array([0, 0, 0]),
     'sigma_0': np.array([[0.5, 0, 0],
@@ -25,7 +24,7 @@ kf_params = {
                          [0, 0, 100]]),
     'landmark': [8, 9],
     'dt': 0.05,
-    'alpha': [0.05, 0.05, 0.05, 0.05],
+    'alpha': [0.01, 0.01, 0.01, 0.01],
 }
 
 
@@ -67,7 +66,7 @@ def construct_B(theta, omega):
     dt = kf_params['dt']
 
     B = np.array([[np.cos(theta + omega * dt), 0],
-                  [0, np.sin(theta + omega * dt)],
+                  [np.sin(theta + omega * dt), 0],
                   [0, dt]])
 
     return B
@@ -102,8 +101,11 @@ def construct_R(theta, v, omega):
 
 def construct_H(x, y):
     """
-    This function construct H function which map the state to observation.
-    :return:
+    This function construct Jacobians H matrix.
+
+    :param x: x pos of the robot
+    :param y: y pos of the robot
+    :return: ndarray H matrix
     """
 
     m_x = kf_params['landmark'][0]  # landmark x pos
@@ -111,9 +113,28 @@ def construct_H(x, y):
     q = (m_x - x) ** 2 + (m_y - y) ** 2  # auxiliary variable
 
     H = np.array([[(m_x - x) / np.sqrt(q), (m_y - y) / np.sqrt(q), 0],
-                  [(y - m_y) / np.sqrt(q), (m_x - x) / np.sqrt(q), -1]])
+                  [(y - m_y) / q, (m_x - x) / q, -1]])
 
     return H
+
+
+def construct_G(theta, v, omega):
+    """
+    This function construct the G matrix
+    todo: fill me
+    :param theta:
+    :param v:
+    :param omega:
+    :return:
+    """
+
+    dt = kf_params['dt']
+
+    G = np.array([[1, 0, -v * np.sin(theta + omega * dt)],
+                  [0, 1, v * np.cos(theta + omega * dt)],
+                  [0, 0, 1]])
+
+    return G
 
 
 def h_function(x, y, theta):
@@ -138,6 +159,26 @@ def h_function(x, y, theta):
     return np.array([r, phi])
 
 
+def g_function(x, y, theta, v, omega):
+    """
+    todo: fill me
+    :param x: x pos of the robot
+    :param y: y pos of the robot
+    :param theta: theta orientation of the robot
+    :param v:
+    :param omega:
+    :return: ndarray of the observation
+    """
+
+    dt = kf_params['dt']
+
+    new_x = x + v * np.cos(theta + omega * dt)
+    new_y = y + v * np.sin(theta + omega * dt)
+    new_theta = theta + omega * dt
+
+    return np.array([new_x, new_y, new_theta])
+
+
 def predict(mu_bar, sigma_bar, control):
     """
     The prediction step in the Kalman filter algorithm.
@@ -149,9 +190,8 @@ def predict(mu_bar, sigma_bar, control):
     """
 
     # Get the relevant matrices
-    A = kf_params['A']
     R = construct_R(theta=mu_bar[2], v=control[0], omega=control[1])
-    B = construct_B(theta=mu_bar[2], omega=control[1])
+    G = construct_G(theta=mu_bar[2], v=control[0], omega=control[1])
 
     # Calculate the next mu and sigma
     new_mu = A @ mu_bar + B @ control
@@ -209,8 +249,8 @@ def kalman_filter(control, measurement):
     """
     Main function in the implementation of the Kalman filter.
     Get the control and measurements of the robot and return the localization according to kalman filter.
-    :param control: list with the control of the robot
-    :param measurement: list with the measurements of the robot
+    :param control: array with the control of the robot
+    :param measurement: array with the measurements of the robot
     :return: list with the localization of the robot
     """
 
@@ -222,7 +262,6 @@ def kalman_filter(control, measurement):
 
     # For each robot step
     for i in range((len(control))):
-
         # Prediction
         mu_bar, sigma_bar = predict(mu, sigma, control[i])
 
@@ -232,4 +271,7 @@ def kalman_filter(control, measurement):
         # Measurement update
         mu, sigma = update_measure(mu_bar, sigma_bar, K, measurement[i])
 
+        # Append the current mu
         localization.append(mu)
+
+    return np.array(localization)

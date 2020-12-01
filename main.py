@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from figures import ground_truth_xy, ground_truth_subplots, ground_truth_measurements
 from kalman_filter import kalman_filter
+import matplotlib.pyplot as plt
 
 # Parameters
 
@@ -37,7 +38,7 @@ def load_data(paths, columns):
 def plot_figures(ground_truth, measurements):
 
     # Figure 1
-    # ground_truth_subplots(ground_truth)
+    ground_truth_subplots(ground_truth)
 
     # Figure 2
     # ground_truth_xy(ground_truth)
@@ -53,8 +54,19 @@ def main():
 
     # plot_figures(data['ground_truth'], data['measurements'])
 
-    # todo: delete the first element in the control and measurements
-    kalman_filter(data['controls'], data['measurements'])
+    kf = kalman_filter(data['controls'], data['measurements'])
+
+    # Debug - plot
+    x = data['ground_truth'].x
+    y = data['ground_truth'].y
+    kf_x = kf[:, 0]
+    kf_y = kf[:, 1]
+    kf_theta = kf[:, 2]
+    plt.plot(x, y)
+    plt.plot(kf_x, kf_y)
+    plt.show()
+
+    print(kf.shape)
 
 
 if __name__ == '__main__':
