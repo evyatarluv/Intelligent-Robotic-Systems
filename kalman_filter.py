@@ -26,6 +26,33 @@ kf_params = {
 }
 
 
+def preprocess_kf_data(controls, measurements):
+    """
+    Pre-process the data in order to fit the kalman filter function.
+    The function:
+        1. Convert to numpy array
+        2. Drop the time column
+        3. Drop the first row which is not needed.
+    :param controls: data frame of the controls of the robot
+    :param measurements: data frame of  the measurements of the robot
+    :return:
+    """
+
+    # Convert to ndarray
+    controls = controls.to_numpy()
+    measurements = measurements.to_numpy()
+
+    # Drop the time column
+    controls = np.delete(controls, obj=0, axis=1)
+    measurements = np.delete(measurements, obj=0, axis=1)
+
+    # Drop the first row
+    controls = np.delete(controls, obj=0, axis=0)
+    measurements = np.delete(measurements, obj=0, axis=0)
+
+    return controls, measurements
+
+
 def construct_B(theta, omega):
     """
     This function construct the current B matrix - how the control change the state.
@@ -127,15 +154,16 @@ def kalman_filter(control, measurement):
     :return: list with the localization of the robot
     """
 
-    steps = len(control)  # num of steps
-    localization = []  # output list
-    mu = kf_params['mu_0']  # init mu
-    sigma = kf_params['sigma_0']  # init sigma
+    # Init params
+    localization = []
+    mu = kf_params['mu_0']
+    sigma = kf_params['sigma_0']
+    control = np.delete
 
     # For each robot step
-    for i in range(steps):
+    for i in range((len(control))):
         
-        mu_bar, sigma_bar = predict(mu, sigma, control.iloc[i].to_list())
+        mu_bar, sigma_bar = predict(mu, sigma, control.iloc[i].to_numpy())
 
         K = kalman_gain(mu_bar, sigma_bar)
 
