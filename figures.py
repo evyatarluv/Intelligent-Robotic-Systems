@@ -1,3 +1,8 @@
+"""
+This script include all the plot functions.
+Each function responsible for different type of plot which was requested in the exercise.
+"""
+
 import matplotlib.pyplot as plt
 import numpy as np
 

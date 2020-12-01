@@ -1,5 +1,6 @@
 import pandas as pd
 from figures import ground_truth_xy, ground_truth_subplots, ground_truth_measurements
+from kalman_filter import kalman_filter
 
 # Parameters
 
@@ -49,7 +50,10 @@ def main():
     # Load the data from all files
     data = load_data(data_params['paths'], data_params['columns'])
 
-    plot_figures(data['ground_truth'], data['measurements'])
+    # plot_figures(data['ground_truth'], data['measurements'])
+
+    # todo: delete the first element in the control and measurements
+    kalman_filter(data['controls'], data['measurements'])
 
 
 if __name__ == '__main__':
