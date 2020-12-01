@@ -159,18 +159,17 @@ def h_function(x, y, theta):
     return np.array([r, phi])
 
 
-def g_function(x, y, theta, v, omega):
+def g_function(state, control):
     """
     todo: fill me
-    :param x: x pos of the robot
-    :param y: y pos of the robot
-    :param theta: theta orientation of the robot
-    :param v:
-    :param omega:
+    :param state:
+    :param control:
     :return: ndarray of the observation
     """
 
     dt = kf_params['dt']
+    x, y, theta = state[0], state[1], state[2]
+    v, omega = control[0], control[1]
 
     new_x = x + v * np.cos(theta + omega * dt)
     new_y = y + v * np.sin(theta + omega * dt)
@@ -179,25 +178,25 @@ def g_function(x, y, theta, v, omega):
     return np.array([new_x, new_y, new_theta])
 
 
-def predict(mu_bar, sigma_bar, control):
+def predict(previous_mu, previous_sigma, control):
     """
     The prediction step in the Kalman filter algorithm.
     Use the current mu & sigma in order to predict the next mu & sigma
-    :param mu_bar: list of state before the control
-    :param sigma_bar: ndarray of the the sigma matrix
+    :param previous_mu: list of state before the control
+    :param previous_sigma: ndarray of the the sigma matrix
     :param control: list of the control the robot did
     :return: predicted mu and sigma of the next step
     """
 
     # Get the relevant matrices
-    R = construct_R(theta=mu_bar[2], v=control[0], omega=control[1])
-    G = construct_G(theta=mu_bar[2], v=control[0], omega=control[1])
+    R = construct_R(theta=previous_mu[2], v=control[0], omega=control[1])
+    G = construct_G(theta=previous_mu[2], v=control[0], omega=control[1])
 
     # Calculate the next mu and sigma
-    new_mu = A @ mu_bar + B @ control
-    new_sigma = A @ sigma_bar @ A.T + R
+    mu_bar = g_function(state=previous_mu, control=control)
+    sigma_bar = G @ previous_sigma @ G.T + R
 
-    return new_mu, new_sigma
+    return mu_bar, sigma_bar
 
 
 def kalman_gain(mu_bar, sigma_bar):
