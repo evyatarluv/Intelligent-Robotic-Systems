@@ -78,6 +78,18 @@ def main():
     # plt.show()
 
     # plot
+    plt.plot(t, x)
+    plt.plot(t[1:], kf_x)
+    plt.show()
+
+    plt.plot(t, y)
+    plt.plot(t[1:], kf_y)
+    plt.show()
+
+    # plt.plot(t, theta)
+    # plt.plot(t[1:], kf_theta)
+    # plt.show()
+
     plt.plot(x, y)
     plt.plot(kf_x, kf_y)
     plt.show()
