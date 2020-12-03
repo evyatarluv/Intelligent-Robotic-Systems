@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from figures import ground_truth_xy, ground_truth_subplots, ground_truth_measurements
+from figures import *
 from extended_kalman_filter import extended_kalman_filter, h_function
 import matplotlib.pyplot as plt
 
@@ -55,6 +55,7 @@ def main():
     # plot_figures(data['ground_truth'], data['measurements'])
 
     kf = extended_kalman_filter(data['controls'], data['measurements'])
+    figure_1(data['ground_truth'], kf)
 
     # Debug
     x = data['ground_truth'].x
@@ -78,21 +79,21 @@ def main():
     # plt.show()
 
     # plot
-    plt.plot(t, x)
-    plt.plot(t[1:], kf_x)
-    plt.show()
+    # plt.plot(t, x)
+    # plt.plot(t[1:], kf_x)
+    # plt.show()
 
-    plt.plot(t, y)
-    plt.plot(t[1:], kf_y)
-    plt.show()
+    # plt.plot(t, y)
+    # plt.plot(t[1:], kf_y)
+    # plt.show()
 
     # plt.plot(t, theta)
     # plt.plot(t[1:], kf_theta)
     # plt.show()
 
-    plt.plot(x, y)
-    plt.plot(kf_x, kf_y)
-    plt.show()
+    # plt.plot(x, y)
+    # plt.plot(kf_x, kf_y)
+    # plt.show()
 
     # plt.plot(t, phi_meas)
     # plt.plot(t, phi)

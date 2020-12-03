@@ -7,7 +7,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def ground_truth_subplots(ground_truth):
+def figure_1(ground_truth, estimation):
+    """
+    Generate requested `Figure 1` - subplots of [x, y, theta].
+    :param ground_truth: ground-truth of the robot
+    :param estimation: localization estimation by algorithm
+    :return:
+    """
 
     # Extract the data from the data frame
     time = ground_truth['time']
@@ -15,17 +21,26 @@ def ground_truth_subplots(ground_truth):
     y = ground_truth['y']
     theta = ground_truth['theta']
 
-    # Figure 1:  ground truth
+    # Set the figure
     fig, ax = plt.subplots(3, sharex='col')
-    ax[0].set_title('Figure 1: Ground Truth')
+    ax[0].set_title('Figure 1: [x, y, theta]')
 
     ax[0].plot(time, x, color='black')
     ax[1].plot(time, y, color='black')
-    ax[2].plot(time, theta, color='black')
+    ax[2].plot(time, theta, color='black', label='Ground Truth')
 
+    if estimation is not None:
+        ax[0].plot(time[1:], estimation[:, 0], color='red')
+        ax[1].plot(time[1:], estimation[:, 1], color='red')
+        ax[2].plot(time[1:], estimation[:, 2], color='red', label='EKF')
+
+    # Set labels
     ax[0].set(ylabel='X (m)')
     ax[1].set(ylabel='Y (m)')
     ax[2].set(ylabel='Theta (rad)', xlabel='Time (s)')
+
+    # Add legend
+    ax[2].legend(loc='lower right', bbox_to_anchor=(1, 0))
 
     plt.show()
 
