@@ -42,10 +42,9 @@ def main():
 
     ekf = extended_kalman_filter(data['controls'], data['measurements'])
 
-    # subplots(data['ground_truth'], None, data['measurements'])
+    subplots(data['ground_truth'], ekf)
 
-    xy_path(data['ground_truth'], ekf, None)
-
+    xy_path(data['ground_truth'], ekf)
 
 
 if __name__ == '__main__':

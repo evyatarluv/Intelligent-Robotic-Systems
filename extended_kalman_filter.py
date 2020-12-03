@@ -95,8 +95,8 @@ def construct_H(x, y):
     m_y = kf_params['landmark'][1]  # landmark y pos
     q = (m_x - x) ** 2 + (m_y - y) ** 2  # auxiliary variable
 
-    H = np.array([[(m_x - x) / np.sqrt(q), (y - m_y) / np.sqrt(q), 0],
-                  [(m_y - y) / q, (m_x - x) / q, -1]])
+    H = np.array([[(x - m_x) / np.sqrt(q), (y - m_y) / np.sqrt(q), 0],
+                  [(m_y - y) / q, (x - m_x) / q, -1]])
 
     return H
 
