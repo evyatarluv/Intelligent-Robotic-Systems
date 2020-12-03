@@ -45,9 +45,10 @@ def figure_1(ground_truth, estimation):
     plt.show()
 
 
-def figure_2(ground_truth, estimation, measurements):
+def figure_2(ground_truth, estimation, measurements, landmark=[8, 9]):
     """
     Figure 2 - XY path of the robot
+    :param landmark: list with the [x,y] landmark position
     :param measurements: ndarray of the measurements, None if nothing
     :param ground_truth: ndarray of the ground-truth of the robot
     :param estimation: ndarray of the estimation by an algorithm, None if not estimation currently
@@ -71,16 +72,16 @@ def figure_2(ground_truth, estimation, measurements):
 
         r = measurements['r']
         phi = measurements['phi']
-        landmark_x = 8
-        landmark_y = 9
+        m_x = landmark[0]
+        m_y = landmark[1]
 
         # Convert from [r, theta] to [x, y] coordinates
-        x_meas = [r[i] * np.cos(np.pi + phi[i] + theta[i]) + landmark_x for i in range(len(r))]
-        y_meas = [r[i] * np.sin(np.pi + phi[i] + theta[i]) + landmark_y for i in range(len(r))]
+        x_meas = [r[i] * np.cos(np.pi + phi[i] + theta[i]) + m_x for i in range(len(r))]
+        y_meas = [r[i] * np.sin(np.pi + phi[i] + theta[i]) + m_y for i in range(len(r))]
 
         # Plot
         plt.scatter(x_meas, y_meas, marker='+', color='blue', label='Measurements')
-        plt.scatter(landmark_x, landmark_y, marker='o', color='red', linewidths=3, label='Landmark')
+        plt.scatter(m_x, m_y, marker='o', color='red', linewidths=3, label='Landmark')
 
     # Some aesthetics to get and handsome graph
     plt.title('Figure 2 - XY Path')
