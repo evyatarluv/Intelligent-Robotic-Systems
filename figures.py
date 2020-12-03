@@ -54,9 +54,11 @@ def subplots(ground_truth, estimation=None, measurements=None):
     if measurements is not None:
 
         meas_x, meas_y = measurements_to_xy(measurements, theta)
+        # meas_theta = [np.arctan2(landmark[1], landmark[0]) + measurements.r[i] for i in range(len(measurements.r))]
 
         ax[0].scatter(time, meas_x, marker='+', color='blue')
         ax[1].scatter(time, meas_y, marker='+', color='blue')
+        # ax[2].scatter(time, meas_theta, marker='+', color='blue')
 
     # Set labels
     ax[0].set(ylabel='X (m)')
@@ -102,6 +104,8 @@ def xy_path(ground_truth, estimation=None, measurements=None):
 
     # Some aesthetics to get and handsome graph
     plt.title('Figure 2 - XY Path')
+    plt.xlabel('X')
+    plt.ylabel('Y')
     plt.legend()
 
     plt.show()
