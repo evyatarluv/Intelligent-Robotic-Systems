@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from figures import ground_truth_xy, ground_truth_subplots, ground_truth_measurements
-from extended_kalman_filter import extended_kalman_filter
+from extended_kalman_filter import extended_kalman_filter, h_function
 import matplotlib.pyplot as plt
 
 # Parameters
@@ -38,7 +38,7 @@ def load_data(paths, columns):
 def plot_figures(ground_truth, measurements):
 
     # Figure 1
-    ground_truth_subplots(ground_truth)
+    # ground_truth_subplots(ground_truth)
 
     # Figure 2
     # ground_truth_xy(ground_truth)
@@ -56,17 +56,38 @@ def main():
 
     kf = extended_kalman_filter(data['controls'], data['measurements'])
 
-    # Debug - plot
+    # Debug
     x = data['ground_truth'].x
     y = data['ground_truth'].y
+    theta = data['ground_truth'].theta
+    t = data['ground_truth'].time
     kf_x = kf[:, 0]
     kf_y = kf[:, 1]
     kf_theta = kf[:, 2]
+    r_meas = data['measurements'].r
+    phi_meas = data['measurements'].phi
+
+    # ground truth r, phi
+    gt = np.array([h_function(x[i], y[i], theta[i]) for i in range(len(x))])
+    r = gt[:, 0]
+    phi = gt[:, 1]
+
+    # scatter
+    # plt.scatter(t, theta, marker='x')
+    # plt.scatter(t[1:], kf_theta, marker='x')
+    # plt.show()
+
+    # plot
     plt.plot(x, y)
     plt.plot(kf_x, kf_y)
     plt.show()
 
-    print(kf.shape)
+    # plt.plot(t, phi_meas)
+    # plt.plot(t, phi)
+    # plt.show()
+
+    # plt.plot(t, data['controls'].omega)
+    # plt.show()
 
 
 if __name__ == '__main__':

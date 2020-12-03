@@ -112,8 +112,8 @@ def construct_H(x, y):
     m_y = kf_params['landmark'][1]  # landmark y pos
     q = (m_x - x) ** 2 + (m_y - y) ** 2  # auxiliary variable
 
-    H = np.array([[(m_x - x) / np.sqrt(q), (m_y - y) / np.sqrt(q), 0],
-                  [(y - m_y) / q, (m_x - x) / q, -1]])
+    H = np.array([[(m_x - x) / np.sqrt(q), (y - m_y) / np.sqrt(q), 0],
+                  [(m_y - y) / q, (m_x - x) / q, -1]])
 
     return H
 
@@ -187,12 +187,13 @@ def predict(previous_mu, previous_sigma, control):
     :return: predicted mu and sigma of the next step
     """
 
-    # Get the relevant matrices
+    # Calculate mu_bar
+    mu_bar = g_function(state=previous_mu, control=control)
+
+    # Calculate sigma_bar
     R = construct_R(theta=previous_mu[2], v=control[0], omega=control[1])
     G = construct_G(theta=previous_mu[2], v=control[0], omega=control[1])
 
-    # Calculate the next mu and sigma
-    mu_bar = g_function(state=previous_mu, control=control)
     sigma_bar = G @ previous_sigma @ G.T + R
 
     return mu_bar, sigma_bar
@@ -211,11 +212,12 @@ def kalman_gain(mu_bar, sigma_bar):
     H = construct_H(x=mu_bar[0], y=mu_bar[1])
 
     # Auxiliary calculation for Kalman gain
-    right_phrase = np.linalg.inv(H @ sigma_bar @ H.T + Q)
-    left_phrase = sigma_bar @ H.T
+    # right_phrase = np.linalg.inv(H @ sigma_bar @ H.T + Q)
+    # left_phrase = sigma_bar @ H.T
 
-    # Return Kalman gain
-    return left_phrase @ right_phrase
+    k = sigma_bar @ H.T @ np.linalg.inv(H @ sigma_bar @ H.T + Q)
+
+    return k
 
 
 def update_measure(mu_bar, sigma_bar, K, measurement):
@@ -260,6 +262,7 @@ def extended_kalman_filter(control, measurement):
 
     # For each robot step
     for i in range((len(control))):
+
         # Prediction
         mu_bar, sigma_bar = predict(mu, sigma, control[i])
 
