@@ -55,7 +55,7 @@ def main():
     # plot_figures(data['ground_truth'], data['measurements'])
 
     kf = extended_kalman_filter(data['controls'], data['measurements'])
-    figure_1(data['ground_truth'], kf)
+    figure_2(data['ground_truth'], None, data['measurements'])
 
     # Debug
     x = data['ground_truth'].x

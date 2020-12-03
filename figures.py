@@ -45,40 +45,45 @@ def figure_1(ground_truth, estimation):
     plt.show()
 
 
-def ground_truth_xy(ground_truth):
+def figure_2(ground_truth, estimation, measurements):
+    """
+    Figure 2 - XY path of the robot
+    :param measurements: ndarray of the measurements, None if nothing
+    :param ground_truth: ndarray of the ground-truth of the robot
+    :param estimation: ndarray of the estimation by an algorithm, None if not estimation currently
+    :return:
+    """
 
     # Extract the data from the data frame
-    time = ground_truth['time']
     x = ground_truth['x']
     y = ground_truth['y']
-
-    plt.plot(x, y, color='black')
-    plt.title('Figure 2: XY-Path')
-    plt.show()
-
-
-def ground_truth_measurements(ground_truth, measurements):
-
-    # Extract data
-    x_truth = ground_truth['x']
-    y_truth = ground_truth['y']
     theta = ground_truth['theta']
-    r = measurements['r']
-    phi = measurements['phi']
-    landmark_x = 8
-    landmark_y = 9
 
-    # Convert from [r, theta] to [x, y] coordinates
-    x_meas = [r[i] * np.cos(np.pi + phi[i] + theta[i]) + landmark_x for i in range(len(r))]
-    y_meas = [r[i] * np.sin(np.pi + phi[i] + theta[i]) + landmark_y for i in range(len(r))]
+    # Plot the ground-truth
+    plt.plot(x, y, color='black')
 
-    # Plot
-    plt.plot(x_truth, y_truth, color='black', label='Ground Truth')
-    plt.scatter(x_meas, y_meas, marker='+', color='blue', label='Measurements')
-    plt.scatter(landmark_x, landmark_y, marker='o', color='red', linewidths=2, label='Landmark')
-    plt.xlabel('X')
-    plt.ylabel('Y')
-    plt.title('XY Path')
-    plt.legend()
+    # Plot the estimation
+    if estimation is not None:
+        plt.plot(estimation[0], estimation[1], color='red')
+
+    # Plot the measurements
+    if measurements is not None:
+
+        r = measurements['r']
+        phi = measurements['phi']
+        landmark_x = 8
+        landmark_y = 9
+
+        # Convert from [r, theta] to [x, y] coordinates
+        x_meas = [r[i] * np.cos(np.pi + phi[i] + theta[i]) + landmark_x for i in range(len(r))]
+        y_meas = [r[i] * np.sin(np.pi + phi[i] + theta[i]) + landmark_y for i in range(len(r))]
+
+        # Plot
+        plt.scatter(x_meas, y_meas, marker='+', color='blue', label='Measurements')
+        plt.scatter(landmark_x, landmark_y, marker='o', color='red', linewidths=2, label='Landmark')
+
+    # Some aesthetics to get and handsome graph
+    plt.title('Figure 2 - XY Path')
+
     plt.show()
 
