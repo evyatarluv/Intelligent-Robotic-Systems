@@ -22,7 +22,7 @@ kf_params = {
     'sigma_0': np.array([[0.5, 0, 0],
                          [0, 0.5, 0],
                          [0, 0, 100]]),
-    'landmark': [8, 10],
+    'landmark': [8, 9],
     'dt': 0.05,
     'alpha': [0.01, 0.01, 0.01, 0.01],
 }
@@ -53,23 +53,6 @@ def preprocess_kf_data(controls, measurements):
     measurements = np.delete(measurements, obj=0, axis=0)
 
     return controls, measurements
-
-
-def construct_B(theta, omega):
-    """
-    This function construct the current B matrix - how the control change the state.
-    :param theta: current theta state
-    :param omega: omega control
-    :return: ndarray of the B matrix
-    """
-
-    dt = kf_params['dt']
-
-    B = np.array([[np.cos(theta + omega * dt), 0],
-                  [np.sin(theta + omega * dt), 0],
-                  [0, dt]])
-
-    return B
 
 
 def construct_R(theta, v, omega):
@@ -191,7 +174,7 @@ def predict(previous_mu, previous_sigma, control):
     mu_bar = g_function(state=previous_mu, control=control)
 
     # Calculate sigma_bar
-    R = construct_R(theta=previous_mu[2], v=control[0], omega=control[1])
+    R = construct_R(theta=mu_bar[2], v=control[0], omega=control[1])
     G = construct_G(theta=previous_mu[2], v=control[0], omega=control[1])
 
     sigma_bar = G @ previous_sigma @ G.T + R
