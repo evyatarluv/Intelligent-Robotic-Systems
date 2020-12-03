@@ -60,7 +60,7 @@ def figure_2(ground_truth, estimation, measurements):
     theta = ground_truth['theta']
 
     # Plot the ground-truth
-    plt.plot(x, y, color='black')
+    plt.plot(x, y, color='black', label='Ground Truth')
 
     # Plot the estimation
     if estimation is not None:
@@ -80,10 +80,11 @@ def figure_2(ground_truth, estimation, measurements):
 
         # Plot
         plt.scatter(x_meas, y_meas, marker='+', color='blue', label='Measurements')
-        plt.scatter(landmark_x, landmark_y, marker='o', color='red', linewidths=2, label='Landmark')
+        plt.scatter(landmark_x, landmark_y, marker='o', color='red', linewidths=3, label='Landmark')
 
     # Some aesthetics to get and handsome graph
     plt.title('Figure 2 - XY Path')
+    plt.legend()
 
     plt.show()
 
