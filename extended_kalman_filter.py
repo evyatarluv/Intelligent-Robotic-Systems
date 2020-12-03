@@ -28,6 +28,7 @@ kf_params = {
 }
 # todo: check about that global variable in python
 
+
 def preprocess_kf_data(controls, measurements):
     """
     Pre-process the data in order to fit the kalman filter function.
@@ -259,7 +260,6 @@ def extended_kalman_filter(control, measurement, params=None):
     # Override params
     if params is not None:
         override_kf_params(params)
-        print(kf_params)
 
     # For each robot step
     for i in range((len(control))):

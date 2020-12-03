@@ -41,15 +41,20 @@ def main():
     data = load_data(data_params['paths'], data_params['columns'])
 
     # First Run
-    # ekf = extended_kalman_filter(data['controls'], data['measurements'])
+    ekf = extended_kalman_filter(data['controls'], data['measurements'])
 
-    # subplots(data['ground_truth'], ekf)
+    subplots(data['ground_truth'], ekf)
 
-    # xy_path(data['ground_truth'], ekf)
+    xy_path(data['ground_truth'], ekf)
 
     # Second Run
-    new_param = {'variances': {'r': -1, 'phi': 0.07}}
+    # Run EKF while' override default sigma_r params
+    new_param = {'variances': {'r': 0.01, 'phi': 0.07}}
     ekf = extended_kalman_filter(data['controls'], data['measurements'], new_param)
+
+    subplots(data['ground_truth'], ekf)
+
+    xy_path(data['ground_truth'], ekf)
 
 
 if __name__ == '__main__':
