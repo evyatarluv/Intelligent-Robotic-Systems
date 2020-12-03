@@ -26,7 +26,7 @@ kf_params = {
     'dt': 0.05,
     'alpha': [0.01, 0.01, 0.01, 0.01],
 }
-
+# todo: check about that global variable in python
 
 def preprocess_kf_data(controls, measurements):
     """
@@ -228,10 +228,23 @@ def update_measure(mu_bar, sigma_bar, K, measurement):
     return mu, sigma
 
 
-def extended_kalman_filter(control, measurement):
+def override_kf_params(new_params):
+
+    """
+    This function override the global kf_params according to the new_params
+    :param new_params:
+    :return:
+    """
+
+    for p in new_params:
+        kf_params[p] = new_params[p]
+
+
+def extended_kalman_filter(control, measurement, params=None):
     """
     Main function in the implementation of the Kalman filter.
     Get the control and measurements of the robot and return the localization according to kalman filter.
+    :param params: params to override the default params in this script
     :param control: array with the control of the robot
     :param measurement: array with the measurements of the robot
     :return: list with the localization of the robot
@@ -242,6 +255,11 @@ def extended_kalman_filter(control, measurement):
     mu = kf_params['mu_0']
     sigma = kf_params['sigma_0']
     control, measurement = preprocess_kf_data(control, measurement)
+
+    # Override params
+    if params is not None:
+        override_kf_params(params)
+        print(kf_params)
 
     # For each robot step
     for i in range((len(control))):
