@@ -35,72 +35,17 @@ def load_data(paths, columns):
     return data
 
 
-def plot_figures(ground_truth, measurements):
-
-    # Figure 1
-    # ground_truth_subplots(ground_truth)
-
-    # Figure 2
-    # ground_truth_xy(ground_truth)
-
-    # Figure 3
-    ground_truth_measurements(ground_truth, measurements)
-
-
 def main():
 
     # Load the data from all files
     data = load_data(data_params['paths'], data_params['columns'])
 
-    # plot_figures(data['ground_truth'], data['measurements'])
+    ekf = extended_kalman_filter(data['controls'], data['measurements'])
 
-    kf = extended_kalman_filter(data['controls'], data['measurements'])
-    # figure_2(data['ground_truth'], kf, None)
+    # subplots(data['ground_truth'], None, data['measurements'])
 
-    # Debug
-    x = data['ground_truth'].x
-    y = data['ground_truth'].y
-    theta = data['ground_truth'].theta
-    t = data['ground_truth'].time
-    kf_x = kf[:, 0]
-    kf_y = kf[:, 1]
-    kf_theta = kf[:, 2]
-    r_meas = data['measurements'].r
-    phi_meas = data['measurements'].phi
+    xy_path(data['ground_truth'], ekf, None)
 
-    # ground truth r, phi
-    gt = np.array([h_function(x[i], y[i], theta[i]) for i in range(len(x))])
-    r = gt[:, 0]
-    phi = gt[:, 1]
-
-    # scatter
-    # plt.scatter(t, theta, marker='x')
-    # plt.scatter(t[1:], kf_theta, marker='x')
-    # plt.show()
-
-    # plot
-    # plt.plot(t, x)
-    # plt.plot(t[1:], kf_x)
-    # plt.show()
-
-    # plt.plot(t, y)
-    # plt.plot(t[1:], kf_y)
-    # plt.show()
-
-    # plt.plot(t, theta)
-    # plt.plot(t[1:], kf_theta)
-    # plt.show()
-
-    # plt.plot(x, y)
-    # plt.plot(kf_x, kf_y)
-    # plt.show()
-
-    # plt.plot(t, phi_meas)
-    # plt.plot(t, phi)
-    # plt.show()
-
-    # plt.plot(t, data['controls'].omega)
-    # plt.show()
 
 
 if __name__ == '__main__':

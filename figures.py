@@ -6,10 +6,27 @@ Each function responsible for different type of plot which was requested in the 
 import matplotlib.pyplot as plt
 import numpy as np
 
+landmark = [8, 9]
 
-def figure_1(ground_truth, estimation):
+
+def measurements_to_xy(measurements, theta):
+
+    r = measurements['r']
+    phi = measurements['phi']
+    m_x = landmark[0]
+    m_y = landmark[1]
+
+    # Convert from [r, theta] to [x, y] coordinates
+    x_meas = [r[i] * np.cos(np.pi + phi[i] + theta[i]) + m_x for i in range(len(r))]
+    y_meas = [r[i] * np.sin(np.pi + phi[i] + theta[i]) + m_y for i in range(len(r))]
+
+    return x_meas, y_meas
+
+
+def subplots(ground_truth, estimation=None, measurements=None):
     """
     Generate requested `Figure 1` - subplots of [x, y, theta].
+    :param measurements:
     :param ground_truth: ground-truth of the robot
     :param estimation: localization estimation by algorithm
     :return:
@@ -34,6 +51,13 @@ def figure_1(ground_truth, estimation):
         ax[1].plot(time[1:], estimation[:, 1], color='red')
         ax[2].plot(time[1:], estimation[:, 2], color='red', label='EKF')
 
+    if measurements is not None:
+
+        meas_x, meas_y = measurements_to_xy(measurements, theta)
+
+        ax[0].scatter(time, meas_x, marker='+', color='blue')
+        ax[1].scatter(time, meas_y, marker='+', color='blue')
+
     # Set labels
     ax[0].set(ylabel='X (m)')
     ax[1].set(ylabel='Y (m)')
@@ -45,10 +69,9 @@ def figure_1(ground_truth, estimation):
     plt.show()
 
 
-def figure_2(ground_truth, estimation, measurements, landmark=[8, 9]):
+def xy_path(ground_truth, estimation=None, measurements=None):
     """
     Figure 2 - XY path of the robot
-    :param landmark: list with the [x,y] landmark position
     :param measurements: ndarray of the measurements, None if nothing
     :param ground_truth: ndarray of the ground-truth of the robot
     :param estimation: ndarray of the estimation by an algorithm, None if not estimation currently
@@ -65,19 +88,13 @@ def figure_2(ground_truth, estimation, measurements, landmark=[8, 9]):
 
     # Plot the estimation
     if estimation is not None:
-        plt.plot(estimation[0], estimation[1], color='red')
+        plt.plot(estimation[:, 0], estimation[:, 1], color='red', label='EKF')
 
     # Plot the measurements
     if measurements is not None:
 
-        r = measurements['r']
-        phi = measurements['phi']
-        m_x = landmark[0]
-        m_y = landmark[1]
-
-        # Convert from [r, theta] to [x, y] coordinates
-        x_meas = [r[i] * np.cos(np.pi + phi[i] + theta[i]) + m_x for i in range(len(r))]
-        y_meas = [r[i] * np.sin(np.pi + phi[i] + theta[i]) + m_y for i in range(len(r))]
+        m_x, m_y = landmark[0], landmark[1]
+        x_meas, y_meas = measurements_to_xy(measurements, theta)
 
         # Plot
         plt.scatter(x_meas, y_meas, marker='+', color='blue', label='Measurements')
