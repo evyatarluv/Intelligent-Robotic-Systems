@@ -243,7 +243,7 @@ def update_measure(mu_bar, sigma_bar, K, measurement):
     return mu, sigma
 
 
-def kalman_filter(control, measurement):
+def extended_kalman_filter(control, measurement):
     """
     Main function in the implementation of the Kalman filter.
     Get the control and measurements of the robot and return the localization according to kalman filter.

@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from figures import ground_truth_xy, ground_truth_subplots, ground_truth_measurements
-from kalman_filter import kalman_filter
+from extended_kalman_filter import extended_kalman_filter
 import matplotlib.pyplot as plt
 
 # Parameters
@@ -54,7 +54,7 @@ def main():
 
     # plot_figures(data['ground_truth'], data['measurements'])
 
-    kf = kalman_filter(data['controls'], data['measurements'])
+    kf = extended_kalman_filter(data['controls'], data['measurements'])
 
     # Debug - plot
     x = data['ground_truth'].x
