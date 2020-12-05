@@ -4,6 +4,8 @@ Each function responsible for different type of plot which was requested in the 
 """
 
 import matplotlib.pyplot as plt
+from matplotlib.patches import Ellipse
+import matplotlib.transforms as transforms
 import numpy as np
 
 landmark = [8, 9]
@@ -71,9 +73,10 @@ def subplots(ground_truth, estimation=None, measurements=None):
     plt.show()
 
 
-def xy_path(ground_truth, estimation=None, measurements=None):
+def xy_path(ground_truth, estimation=None, measurements=None, return_axes=False):
     """
     Figure 2 - XY path of the robot
+    :param return_axes: bool. If to return an axes object or to plot it
     :param measurements: ndarray of the measurements, None if nothing
     :param ground_truth: ndarray of the ground-truth of the robot
     :param estimation: ndarray of the estimation by an algorithm, None if not estimation currently
@@ -85,12 +88,14 @@ def xy_path(ground_truth, estimation=None, measurements=None):
     y = ground_truth['y']
     theta = ground_truth['theta']
 
+    f, ax = plt.subplots()
+
     # Plot the ground-truth
-    plt.plot(x, y, color='black', label='Ground Truth')
+    ax.plot(x, y, color='black', label='Ground Truth')
 
     # Plot the estimation
     if estimation is not None:
-        plt.plot(estimation[:, 0], estimation[:, 1], color='red', label='EKF')
+        ax.plot(estimation[:, 0], estimation[:, 1], color='red', label='EKF')
 
     # Plot the measurements
     if measurements is not None:
@@ -103,10 +108,34 @@ def xy_path(ground_truth, estimation=None, measurements=None):
         plt.scatter(m_x, m_y, marker='o', color='red', linewidths=3, label='Landmark')
 
     # Some aesthetics to get and handsome graph
-    plt.title('Figure 2 - XY Path')
-    plt.xlabel('X')
-    plt.ylabel('Y')
-    plt.legend()
+    ax.set_title('Figure 2 - XY Path')
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.legend()
 
-    plt.show()
+    if return_axes:
+        return ax
+    else:
+        plt.show()
 
+
+def get_cov_ellipse(cov, centre, nstd, **kwargs):
+    """
+    Return a matplotlib Ellipse patch representing the covariance matrix
+    cov centred at centre and scaled by the factor nstd.
+
+    """
+
+    # Find and sort eigenvalues and eigenvectors into descending order
+    eigvals, eigvecs = np.linalg.eigh(cov)
+    order = eigvals.argsort()[::-1]
+    eigvals, eigvecs = eigvals[order], eigvecs[:, order]
+
+    # The anti-clockwise angle to rotate our ellipse by
+    vx, vy = eigvecs[:,0][0], eigvecs[:,0][1]
+    theta = np.arctan2(vy, vx)
+
+    # Width and height of ellipse to draw
+    width, height = 2 * nstd * np.sqrt(eigvals)
+    return Ellipse(xy=centre, width=width, height=height,
+                   angle=np.degrees(theta), **kwargs)

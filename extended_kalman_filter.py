@@ -252,7 +252,7 @@ def extended_kalman_filter(control, measurement, params=None):
     """
 
     # Init params
-    localization = []
+    estimated_mu, estimated_sigma = [], []
     mu = kf_params['mu_0']
     sigma = kf_params['sigma_0']
     control, measurement = preprocess_kf_data(control, measurement)
@@ -273,7 +273,8 @@ def extended_kalman_filter(control, measurement, params=None):
         # Measurement update
         mu, sigma = update_measure(mu_bar, sigma_bar, K, measurement[i])
 
-        # Append the current mu
-        localization.append(mu)
+        # Append the current mu & sigma
+        estimated_mu.append(mu)
+        estimated_sigma.append(sigma)
 
-    return np.array(localization)
+    return np.array(estimated_mu), np.array(estimated_sigma)
