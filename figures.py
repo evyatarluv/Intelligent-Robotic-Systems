@@ -12,7 +12,6 @@ landmark = [8, 9]
 
 
 def measurements_to_xy(measurements, theta):
-
     r = measurements['r']
     phi = measurements['phi']
     m_x = landmark[0]
@@ -54,7 +53,6 @@ def subplots(ground_truth, estimation=None, measurements=None):
         ax[2].plot(time[1:], estimation[:, 2], color='red', label='EKF')
 
     if measurements is not None:
-
         meas_x, meas_y = measurements_to_xy(measurements, theta)
         # meas_theta = [np.arctan2(landmark[1], landmark[0]) + measurements.r[i] for i in range(len(measurements.r))]
 
@@ -99,7 +97,6 @@ def xy_path(ground_truth, estimation=None, measurements=None, return_axes=False)
 
     # Plot the measurements
     if measurements is not None:
-
         m_x, m_y = landmark[0], landmark[1]
         x_meas, y_meas = measurements_to_xy(measurements, theta)
 
@@ -132,7 +129,7 @@ def get_cov_ellipse(cov, centre, nstd, **kwargs):
     eigvals, eigvecs = eigvals[order], eigvecs[:, order]
 
     # The anti-clockwise angle to rotate our ellipse by
-    vx, vy = eigvecs[:,0][0], eigvecs[:,0][1]
+    vx, vy = eigvecs[:, 0][0], eigvecs[:, 0][1]
     theta = np.arctan2(vy, vx)
 
     # Width and height of ellipse to draw
@@ -141,17 +138,22 @@ def get_cov_ellipse(cov, centre, nstd, **kwargs):
                    angle=np.degrees(theta), **kwargs)
 
 
-def add_confidence_ellipse(ax, estimated_sigma, times):
+def add_confidence_ellipse(ax, estimated_sigma, estimated_mean, times):
 
-    """
+    # Add init mu and sigma
+    init_sigma = np.array([[0.5, 0, 0], [0, 0.5, 0], [0, 0, 100]])
+    init_mu = np.array([0, 0, 0])
+    estimated_sigma = np.insert(estimated_sigma, 0, init_sigma, 0)
+    estimated_mean = np.insert(estimated_mean, 0, init_mu, 0)
 
-    :param ax:
-    :param estimated_sigma:
-    :param times:
-    :return:
-    """
+    # Get x & y
+    x = estimated_mean[times, 0]
+    y = estimated_mean[times, 1]
 
-    for t in times:
+    for i, t in enumerate(times):
+
+        # Get x,y
+        center_x, center_y = x[i], y[i]
 
         # Take the relevant cov matrix
         sigma = estimated_sigma[t, :, :]
@@ -160,4 +162,8 @@ def add_confidence_ellipse(ax, estimated_sigma, times):
         sigma = sigma[0: 2, 0: 2]
 
         # Add ellipse
-        # ellipse = get_cov_ellipse(sigma, )
+        ellipse = get_cov_ellipse(sigma, (center_x, center_y), 2, fc='red', alpha=0.2)
+        ax.add_artist(ellipse)
+        ax.scatter(center_x, center_y, color='red', s=8.5)
+
+    plt.show()

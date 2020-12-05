@@ -18,6 +18,7 @@ data_params = {
                 }
 }
 
+ellipse_times = [int(i / 0.05) for i in [0, 2, 4, 6, 8, 10]]  # times to show an ellipse
 
 def load_data(paths, columns):
     """
@@ -46,7 +47,7 @@ def main():
 
     ax = xy_path(data['ground_truth'], ekf_mean, return_axes=True)
 
-    add_confidence_ellipse(ax, ekf_sigma, time=[0, 2, 4, 6, 8, 10])
+    add_confidence_ellipse(ax, ekf_sigma, ekf_mean, times=ellipse_times)
 
     # Second Run
     # Run EKF while' override default sigma_r params
