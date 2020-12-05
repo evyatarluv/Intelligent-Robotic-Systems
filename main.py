@@ -36,7 +36,6 @@ def load_data(paths, columns):
 
 
 def main():
-
     # Load the data from all files
     data = load_data(data_params['paths'], data_params['columns'])
 
@@ -47,7 +46,7 @@ def main():
 
     ax = xy_path(data['ground_truth'], ekf_mean, return_axes=True)
 
-    
+    add_confidence_ellipse(ax, ekf_sigma, time=[0, 2, 4, 6, 8, 10])
 
     # Second Run
     # Run EKF while' override default sigma_r params
@@ -60,5 +59,4 @@ def main():
 
 
 if __name__ == '__main__':
-
     main()

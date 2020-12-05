@@ -139,3 +139,25 @@ def get_cov_ellipse(cov, centre, nstd, **kwargs):
     width, height = 2 * nstd * np.sqrt(eigvals)
     return Ellipse(xy=centre, width=width, height=height,
                    angle=np.degrees(theta), **kwargs)
+
+
+def add_confidence_ellipse(ax, estimated_sigma, times):
+
+    """
+
+    :param ax:
+    :param estimated_sigma:
+    :param times:
+    :return:
+    """
+
+    for t in times:
+
+        # Take the relevant cov matrix
+        sigma = estimated_sigma[t, :, :]
+
+        # Change it to contain only (x, y) data
+        sigma = sigma[0: 2, 0: 2]
+
+        # Add ellipse
+        # ellipse = get_cov_ellipse(sigma, )
