@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from figures import *
-from extended_kalman_filter import extended_kalman_filter, h_function
+from extended_kalman_filter import extended_kalman_filter
 import matplotlib.pyplot as plt
 
 # Parameters
@@ -19,6 +19,7 @@ data_params = {
 }
 
 ellipse_times = [int(i / 0.05) for i in [0, 2, 4, 6, 8, 10]]  # times to show an ellipse
+
 
 def load_data(paths, columns):
     """
@@ -41,22 +42,23 @@ def main():
     data = load_data(data_params['paths'], data_params['columns'])
 
     # First Run
-    ekf_mean, ekf_sigma = extended_kalman_filter(data['controls'], data['measurements'])
+    ekf_mu, ekf_sigma = extended_kalman_filter(data['controls'], data['measurements'])
 
-    subplots(data['ground_truth'], ekf_mean)
+    subplots(data['ground_truth'], ekf_mu)
 
-    ax = xy_path(data['ground_truth'], ekf_mean, return_axes=True)
+    ax = xy_path(data['ground_truth'], ekf_mu, return_axes=True)
 
-    add_confidence_ellipse(ax, ekf_sigma, ekf_mean, times=ellipse_times)
+    add_confidence_ellipse(ax, ekf_sigma, ekf_mu, times=ellipse_times)
 
     # Second Run
     # Run EKF while' override default sigma_r params
-    # new_param = {'variances': {'r': 0.01, 'phi': 0.007}}
-    # ekf = extended_kalman_filter(data['controls'], data['measurements'], new_param)
-    #
-    # subplots(data['ground_truth'], ekf)
-    #
-    # xy_path(data['ground_truth'], ekf)
+    new_param = {'variances': {'r': 0.01, 'phi': 0.007}}
+    ekf_mu, ekf_sigma = extended_kalman_filter(data['controls'], data['measurements'], new_param)
+
+    subplots(data['ground_truth'], ekf_mu)
+
+    ax = xy_path(data['ground_truth'], ekf_mu, return_axes=True)
+    add_confidence_ellipse(ax, ekf_sigma, ekf_mu, times=ellipse_times)
 
 
 if __name__ == '__main__':
