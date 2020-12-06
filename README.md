@@ -6,4 +6,6 @@
 
 1. **.py* - python scripts for loading the data, EKF implementation and figures' plots.
 
+1. *data* - data folder with the given data (for case you run my code).
+
 Thanks!
