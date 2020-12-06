@@ -43,22 +43,25 @@ def subplots(ground_truth, estimation=None, measurements=None):
     fig, ax = plt.subplots(3, sharex='col')
     ax[0].set_title('Figure 1: [x, y, theta]')
 
-    ax[0].plot(time, x, color='black')
+    ax[0].plot(time, x, color='black', label='Ground Truth')
     ax[1].plot(time, y, color='black')
-    ax[2].plot(time, theta, color='black', label='Ground Truth')
+    ax[2].plot(time, theta, color='black')
 
-    if estimation is not None:
-        ax[0].plot(time[1:], estimation[:, 0], color='red')
-        ax[1].plot(time[1:], estimation[:, 1], color='red')
-        ax[2].plot(time[1:], estimation[:, 2], color='red', label='EKF')
-
+    # Add measurements
     if measurements is not None:
         meas_x, meas_y = measurements_to_xy(measurements, theta)
-        # meas_theta = [np.arctan2(landmark[1], landmark[0]) + measurements.r[i] for i in range(len(measurements.r))]
+        meas_theta = [np.arctan2(landmark[1] - y[i], landmark[0] - x[i]) - measurements.phi[i]
+                      for i in range(len(measurements.phi))]
 
-        ax[0].scatter(time, meas_x, marker='+', color='blue')
+        ax[0].scatter(time, meas_x, marker='+', color='blue', label='Measurements')
         ax[1].scatter(time, meas_y, marker='+', color='blue')
-        # ax[2].scatter(time, meas_theta, marker='+', color='blue')
+        ax[2].scatter(time, meas_theta, marker='+', color='blue')
+
+    # Add estimations
+    if estimation is not None:
+        ax[0].plot(time[1:], estimation[:, 0], color='red', label='EKF')
+        ax[1].plot(time[1:], estimation[:, 1], color='red')
+        ax[2].plot(time[1:], estimation[:, 2], color='red')
 
     # Set labels
     ax[0].set(ylabel='X (m)')
@@ -66,7 +69,7 @@ def subplots(ground_truth, estimation=None, measurements=None):
     ax[2].set(ylabel='Theta (rad)', xlabel='Time (s)')
 
     # Add legend
-    ax[2].legend(loc='lower right', bbox_to_anchor=(1, 0))
+    ax[0].legend(loc='lower right', bbox_to_anchor=(1, 0.8))
 
     plt.show()
 

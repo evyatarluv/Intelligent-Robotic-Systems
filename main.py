@@ -17,21 +17,21 @@ def main():
     # First Run
     ekf_mu, ekf_sigma = extended_kalman_filter(data['controls'], data['measurements'])
 
-    subplots(data['ground_truth'], ekf_mu)
+    subplots(data['ground_truth'], ekf_mu, data['measurements'])
 
-    ax = xy_path(data['ground_truth'], ekf_mu, return_axes=True)
-
-    add_confidence_ellipse(ax, ekf_sigma, ekf_mu, times=ellipse_times)
+    # ax = xy_path(data['ground_truth'], ekf_mu, return_axes=True)
+    #
+    # add_confidence_ellipse(ax, ekf_sigma, ekf_mu, times=ellipse_times)
 
     # Second Run
     # Run EKF while' override default sigma_r params
-    new_param = {'variances': {'r': 0.01, 'phi': 0.007}}
-    ekf_mu, ekf_sigma = extended_kalman_filter(data['controls'], data['measurements'], new_param)
-
-    subplots(data['ground_truth'], ekf_mu)
-
-    ax = xy_path(data['ground_truth'], ekf_mu, return_axes=True)
-    add_confidence_ellipse(ax, ekf_sigma, ekf_mu, times=ellipse_times)
+    # new_param = {'variances': {'r': 0.01, 'phi': 0.007}}
+    # ekf_mu, ekf_sigma = extended_kalman_filter(data['controls'], data['measurements'], new_param)
+    #
+    # subplots(data['ground_truth'], ekf_mu)
+    #
+    # ax = xy_path(data['ground_truth'], ekf_mu, return_axes=True)
+    # add_confidence_ellipse(ax, ekf_sigma, ekf_mu, times=ellipse_times)
 
 
 if __name__ == '__main__':
