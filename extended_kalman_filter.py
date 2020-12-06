@@ -26,7 +26,6 @@ kf_params = {
     'dt': 0.05,
     'alpha': [0.01, 0.01, 0.01, 0.01],
 }
-# todo: check about that global variable in python
 
 
 def preprocess_kf_data(controls, measurements):

@@ -1,45 +1,18 @@
 import pandas as pd
 import numpy as np
+from load_data import load_data
 from figures import *
 from extended_kalman_filter import extended_kalman_filter
 import matplotlib.pyplot as plt
 
 # Parameters
 
-
-data_params = {
-    'paths': {'measurements': 'data/measurements.txt',
-              'controls': 'data/controls.txt',
-              'ground_truth': 'data/ground_truth.txt'
-              },
-    'columns': {'measurements': ['time', 'r', 'phi'],
-                'controls': ['time', 'v', 'omega'],
-                'ground_truth': ['time', 'x', 'y', 'theta']
-                }
-}
-
 ellipse_times = [int(i / 0.05) for i in [0, 2, 4, 6, 8, 10]]  # times to show an ellipse
-
-
-def load_data(paths, columns):
-    """
-    This function get the data and return it as dict
-
-    :param columns: dict with the columns names for each data
-    :param paths: dict with the data name as key and path as value
-    :return:
-    """
-    data = {}
-
-    for file in paths:
-        data[file] = pd.read_csv(paths[file], names=columns[file])
-
-    return data
 
 
 def main():
     # Load the data from all files
-    data = load_data(data_params['paths'], data_params['columns'])
+    data = load_data()
 
     # First Run
     ekf_mu, ekf_sigma = extended_kalman_filter(data['controls'], data['measurements'])
