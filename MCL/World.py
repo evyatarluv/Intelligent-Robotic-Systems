@@ -21,7 +21,7 @@ class World:
         # the locations of the 4 landmarks in our problem
         self.landmarks = landmarks
 
-    def plot(self, show=True):
+    def plot(self, show=False):
         """
         plotting the map with sizes
         :param show: indicator - to show the map or not
