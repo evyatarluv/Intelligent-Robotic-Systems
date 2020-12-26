@@ -1,7 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 from scipy.stats import norm
-from Ploter import config_plot
+from .Ploter import config_plot
 
 
 class Robot:
@@ -23,6 +23,13 @@ class Robot:
         self.turn_noise = 0
         self.sense_distance_noise = 0
 
+    def __str__(self):
+        """"
+        printing the pose
+        """
+
+        return '[x = {}, y = {} heading = {}]'.format(round(self.x, 3), round(self.y, 3), round(self.theta, 3))
+
     def set(self, new_x, new_y, new_orientation):
         """
         setting the configuration of the robot
@@ -43,15 +50,10 @@ class Robot:
         self.y = new_y
         self.theta = new_orientation
 
-    def print(self):
-        """"
-        printing the pose
-        """
-        print('[x= {} y={} heading={}]'.format(self.x, self.y, self.theta))
-
     def plot(self, mycolor="b", style="robot", show=True, markersize=1):
         """
         plotting the pose of the robot in the world
+        :param markersize:
         :param mycolor: the color of the robot
         :param style: the style to plot with
         :param show: if to show or not show - used to create a new figure or not
@@ -84,8 +86,6 @@ class Robot:
         self.turn_noise = new_turn_noise
         self.sense_noise_range = new_sense_noise_range
         self.sense_noise_bearing = new_sense_noise_bearing
-
-
 
     def get_pose(self):
         """

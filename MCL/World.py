@@ -2,18 +2,21 @@
 in this module we are declaring the world class
 """
 from matplotlib import pyplot as plt
-from Ploter import config_plot
+from .Ploter import config_plot
 
 
 class World:
     """
     a class used to describe the world, actually the map of the world
     """
-    def __init__(self, world_size=100, landmarks=[(20.0, 20.0),(50.0, 20.0), (80.0, 20.0), (80.0, 80.0), (50.0, 80.0),(20.0, 80.0)]):
+    def __init__(self, world_size=100, landmarks=None):
         """
         constructor for the map
         :param world_size: the size of the world in pixels
         """
+        if landmarks is None:
+            landmarks = [(20.0, 20.0), (50.0, 20.0), (80.0, 20.0), (80.0, 80.0), (50.0, 80.0), (20.0, 80.0)]
+
         self.world_size = world_size
         # the locations of the 4 landmarks in our problem
         self.landmarks = landmarks
@@ -31,7 +34,7 @@ class World:
         ax.set_aspect("equal")
 
         if show:
-             plt.show()
+            plt.show()
 
     def get_world_size(self):
         """
