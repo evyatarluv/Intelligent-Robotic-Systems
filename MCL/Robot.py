@@ -16,7 +16,7 @@ def x_motion(x, theta, u_1, u_2, noise_std):
     :return: float, new x pose
     """
 
-    noise = np.random.normal(0, noise_std, 1)
+    noise = np.random.normal(0, noise_std)
     return x + u_2 * np.cos(theta + u_1) + noise
 
 
@@ -31,7 +31,7 @@ def y_motion(y, theta, u_1, u_2, noise_std):
     :return: float, new y pose
     """
 
-    noise = np.random.normal(0, noise_std, 1)
+    noise = np.random.normal(0, noise_std)
     return y + u_2 * np.cos(theta + u_1) + noise
 
 
@@ -44,7 +44,7 @@ def theta_motion(theta, u_1, noise_std):
     :return: float, new theta pose
     """
 
-    noise = np.random.normal(0, noise_std, 1)
+    noise = np.random.normal(0, noise_std)
     return theta + u_1
 
 
@@ -70,11 +70,7 @@ class Robot:
             self.x, self.y, self.theta = init_pose
 
         # Noise declaration
-        self.forward_noise = 0
-        self.turn_noise = 0
-        self.sense_distance_noise = 0
-        self.sense_noise_range = 0
-        self.sense_noise_bearing = 0
+        self.noise_std = {'forward': 0, 'turn': 0, 'range': 0, 'bearing': 0, 'distance': 0}
 
         # Motion Model
         self.x_motion = x_motion
@@ -132,7 +128,7 @@ class Robot:
         if show:
             plt.show()
 
-    def set_noise(self, new_forward_noise, new_turn_noise,new_sense_noise_range, new_sense_noise_bearing):
+    def set_noise(self, new_forward_noise, new_turn_noise, new_sense_noise_range, new_sense_noise_bearing):
         """
         setting the noise if pose of the robot
         :param new_forward_noise: the noise for moving forward
@@ -141,10 +137,10 @@ class Robot:
         :param new_sense_noise_bearing: the noise in bearing measurement
         """
 
-        self.forward_noise = new_forward_noise
-        self.turn_noise = new_turn_noise
-        self.sense_noise_range = new_sense_noise_range
-        self.sense_noise_bearing = new_sense_noise_bearing
+        self.noise_std['forward'] = new_forward_noise
+        self.noise_std['turn'] = new_turn_noise
+        self.noise_std['range'] = new_sense_noise_range
+        self.noise_std['bearing'] = new_sense_noise_bearing
 
     def get_pose(self):
         """
@@ -162,9 +158,9 @@ class Robot:
         """
 
         # Compute the new pose of the robot
-        new_x = self.x_motion(self.x, self.theta, u_1, u_2, self.forward_noise)
-        new_y = self.y_motion(self.y, self.theta, u_1, u_2, self.forward_noise)
-        new_theta = self.theta_motion(self.theta, u_1, self.turn_noise)
+        new_x = self.x_motion(self.x, self.theta, u_1, u_2, self.noise_std['forward'])
+        new_y = self.y_motion(self.y, self.theta, u_1, u_2, self.noise_std['forward'])
+        new_theta = self.theta_motion(self.theta, u_1, self.noise_std['turn'])
 
         # Set the new pose as the robot pose
         self.set(new_x, new_y, new_theta)
@@ -182,12 +178,39 @@ class Robot:
 
         for m in landmarks:
 
+            # Get measurement noise
+            range_noise = np.random.normal(0, self.noise_std['range'])
+            bearing_noise = np.random.normal(0, self.noise_std['bearing'])
+
             # Compute range and bearing of the robot from the current landmark
-            r = np.sqrt((m[0] - self.x) ** 2 + (m[1] - self.y) ** 2) + self.sense_noise_range
-            phi = np.arctan2(m[1] - self.y, m[0] - self.x) - self.theta + self.sense_noise_bearing
+            r = np.sqrt((m[0] - self.x) ** 2 + (m[1] - self.y) ** 2) + range_noise
+            phi = np.arctan2(m[1] - self.y, m[0] - self.x) - self.theta + bearing_noise
 
             # Append the measurement
             measurements.append((r, phi))
 
         return measurements
 
+    def measurement_probability(self, pose, measurement, landmark):
+        """
+        The method compute the probability for a given measurement to be observed when being
+        in a given pose.
+        :param landmark: landmark position, (x,y)
+        :param pose: given pose of the robot, (x, y, theta)
+        :param measurement: real measurement, (range, bearing)
+        :return: float, probability between 0 to 1
+        """
+
+        x, y, theta = pose
+
+        # Create normal distributions according to the range & bearing std
+        range_dist = norm(0, self.noise_std['range'])
+        bearing_dist = norm(0, self.noise_std['bearing'])
+
+        # Compute measurement giving the pose
+        meas_r = np.sqrt((landmark[0] - x) ** 2 + (landmark[1] - y) ** 2)
+        meas_phi = np.arctan2(landmark[1] - y, landmark[0] - x) - theta
+
+        prob = range_dist.pdf(meas_r) * bearing_dist.pdf(meas_phi)
+
+        return prob
