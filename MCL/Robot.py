@@ -173,6 +173,7 @@ class Robot:
 
         """
         The method measure distance and bearing to each landmark.
+        Each measurement from the returns list contain tuples (range, bearing)
         :param landmarks: list with m tuples, each tuple contain (x, y) pose of landmark
         :return: list with m tuples, when m is the amount of landmarks
         """
@@ -181,12 +182,12 @@ class Robot:
 
         for m in landmarks:
 
-            # Compute distance and bearing of the robot from the current landmark
-            distance = np.sqrt((m[0] - self.x) ** 2 + (m[1] - self.y) ** 2) + self.sense_noise_range
-            bearing = np.arctan2(m[1] - self.y, m[0] - self.x) - self.theta + self.sense_noise_bearing
+            # Compute range and bearing of the robot from the current landmark
+            r = np.sqrt((m[0] - self.x) ** 2 + (m[1] - self.y) ** 2) + self.sense_noise_range
+            phi = np.arctan2(m[1] - self.y, m[0] - self.x) - self.theta + self.sense_noise_bearing
 
             # Append the measurement
-            measurements.append((distance, bearing))
+            measurements.append((r, phi))
 
         return measurements
 
