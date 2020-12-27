@@ -4,6 +4,50 @@ from scipy.stats import norm
 from .Ploter import config_plot
 
 
+# Deterministic motion model of the robot
+def x_motion(x, theta, u_1, u_2, noise_std):
+    """
+    The motion model of x pose
+    :param x: float, current x of the robot
+    :param theta: float, current theta of the robot
+    :param u_1: float, turn command in radians
+    :param u_2: float, movement command
+    :param noise_std: float, std of the movement
+    :return: float, new x pose
+    """
+
+    noise = np.random.normal(0, noise_std, 1)
+    return x + u_2 * np.cos(theta + u_1) + noise
+
+
+def y_motion(y, theta, u_1, u_2, noise_std):
+    """
+    The motion model of y pose
+    :param y: float, current x of the robot
+    :param theta: float, current theta of the robot
+    :param u_1: float, turn command in radians
+    :param u_2: float, movement command
+    :param noise_std: float, std of the movement
+    :return: float, new y pose
+    """
+
+    noise = np.random.normal(0, noise_std, 1)
+    return y + u_2 * np.cos(theta + u_1) + noise
+
+
+def theta_motion(theta, u_1, noise_std):
+    """
+    The motion model of theta pose
+    :param theta: float, current theta of the robot
+    :param u_1: float, turn command in radians
+    :param noise_std: float, std of the turn
+    :return: float, new theta pose
+    """
+
+    noise = np.random.normal(0, noise_std, 1)
+    return theta + u_1
+
+
 class Robot:
     """
     the robot class, we will use this to describe a robot
@@ -31,6 +75,9 @@ class Robot:
         self.sense_distance_noise = 0
         self.sense_noise_range = 0
         self.sense_noise_bearing = 0
+
+        # Motion Model
+
 
     def __str__(self):
         """"
@@ -103,5 +150,13 @@ class Robot:
         :return: (x, y, theta) the pose vector
         """
         return self.x, self.y, self.theta
+
+    def move(self, u_1, u_2):
+        """
+        The method move the robot according to the given motor command - u1, u2
+        :param u_1: float in range [0, 2 * pi), turn command
+        :param u_2: float in range [0, inf), movement command
+        :return:
+        """
 
 
