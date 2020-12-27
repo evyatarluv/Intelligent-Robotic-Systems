@@ -11,16 +11,18 @@ import numpy as np
 # list(map(lambda x: x.plot(show=False), robots))
 # plt.show()
 
-# e.
-robot = Robot(init_pose=(10, 15, 0))
+# e., g.
+robot_1 = Robot(init_pose=(10, 15, 0))
+robot_2 = Robot(init_pose=(10, 15, 0), noise_std={'forward': 6, 'turn': 0.1, 'range': 5, 'bearing': 0.3})
 moves = [(0, 60), (np.pi / 3, 30), (np.pi / 4, 30), (np.pi / 4, 20), (np.pi / 4, 40)]
 world = World()
 world.plot()
-robot.plot()
+robot_1.plot()
+robot_2.plot(mycolor='r')
 
 for m in moves:
-    robot.move(m[0], m[1])
-    robot.plot()
+    robot_1.move(m[0], m[1])
+    robot_1.plot()
 
-plt.plot(*(zip(*robot.path)), ':')
+plt.plot(*(zip(*robot_1.path)), ':')
 plt.show()

@@ -1,3 +1,5 @@
+import copy
+
 import numpy as np
 from matplotlib import pyplot as plt
 from scipy.stats import norm
@@ -52,11 +54,12 @@ class Robot:
     """
     the robot class, we will use this to describe a robot
     """
-    def __init__(self, world_size=100, init_pose=None):
+    def __init__(self, world_size=100, init_pose=None, noise_std=None):
         """
         creating a robot object
-        :param init_pose: the init position of the robot
-        :param world_size: the world size in pixels
+        :param init_pose: tuple, the init position of the robot
+        :param noise_std: dict, noise of the robot
+        :param world_size: int, the world size in pixels
         """
 
         self._world_size = world_size
@@ -70,7 +73,10 @@ class Robot:
             self.x, self.y, self.theta = init_pose
 
         # Noise
-        self.noise_std = {'forward': 0, 'turn': 0, 'range': 0, 'bearing': 0, 'distance': 0}
+        if noise_std is None:
+            self.noise_std = {'forward': 0, 'turn': 0, 'range': 0, 'bearing': 0}
+        else:
+            self.noise_std = copy.deepcopy(noise_std)
 
         # Motion Model
         self.x_motion = x_motion
