@@ -32,7 +32,7 @@ def y_motion(y, theta, u_1, u_2, noise_std):
     """
 
     noise = np.random.normal(0, noise_std)
-    return y + u_2 * np.cos(theta + u_1) + noise
+    return y + u_2 * np.sin(theta + u_1) + noise
 
 
 def theta_motion(theta, u_1, noise_std):
@@ -61,7 +61,7 @@ class Robot:
 
         self._world_size = world_size
 
-        # Pose declaration
+        # Init pose
         if init_pose is None:
             self.x = np.random.rand() * self._world_size
             self.y = np.random.rand() * self._world_size
@@ -69,13 +69,16 @@ class Robot:
         else:
             self.x, self.y, self.theta = init_pose
 
-        # Noise declaration
+        # Noise
         self.noise_std = {'forward': 0, 'turn': 0, 'range': 0, 'bearing': 0, 'distance': 0}
 
         # Motion Model
         self.x_motion = x_motion
         self.y_motion = y_motion
         self.theta_motion = theta_motion
+
+        # Path
+        self.path = [(self.x, self.y)]
 
     def __str__(self):
         """"
@@ -164,6 +167,9 @@ class Robot:
 
         # Set the new pose as the robot pose
         self.set(new_x, new_y, new_theta)
+
+        # Append the new pose to the path
+        self.path.append((self.x, self.y))
 
     def sense(self, landmarks):
 
