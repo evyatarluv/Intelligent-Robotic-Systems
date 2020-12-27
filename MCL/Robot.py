@@ -201,16 +201,21 @@ class Robot:
         :return: float, probability between 0 to 1
         """
 
+        # Extract values
         x, y, theta = pose
+        r, phi = measurement
+        m_x, m_y = landmark
 
         # Create normal distributions according to the range & bearing std
-        range_dist = norm(0, self.noise_std['range'])
-        bearing_dist = norm(0, self.noise_std['bearing'])
+        r_dist = norm(0, self.noise_std['range'])
+        phi_dist = norm(0, self.noise_std['bearing'])
 
         # Compute measurement giving the pose
-        meas_r = np.sqrt((landmark[0] - x) ** 2 + (landmark[1] - y) ** 2)
-        meas_phi = np.arctan2(landmark[1] - y, landmark[0] - x) - theta
+        meas_r = np.sqrt((m_x - x) ** 2 + (m_y - y) ** 2)
+        meas_phi = np.arctan2(m_y - y, m_x - x) - theta
 
-        prob = range_dist.pdf(meas_r) * bearing_dist.pdf(meas_phi)
+        # Compute the probability for each measure
+        prob_r = r_dist.pdf(r - meas_r)
+        prob_phi = phi_dist.pdf(phi - meas_phi)
 
-        return prob
+        return prob_r * prob_phi
