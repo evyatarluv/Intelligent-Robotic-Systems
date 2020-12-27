@@ -77,7 +77,9 @@ class Robot:
         self.sense_noise_bearing = 0
 
         # Motion Model
-
+        self.x_motion = x_motion
+        self.y_motion = y_motion
+        self.theta_motion = theta_motion
 
     def __str__(self):
         """"
@@ -100,7 +102,7 @@ class Robot:
             raise Exception('Y coordinate out of bound')
 
         if new_orientation < 0.0 or new_orientation >= 2 * np.pi:
-            Exception('Orientation must be in [0,2pi]')
+            raise Exception('Orientation must be in [0,2pi]')
 
         self.x = new_x
         self.y = new_y
@@ -159,4 +161,11 @@ class Robot:
         :return:
         """
 
+        # Compute the new pose of the robot
+        new_x = self.x_motion(self.x, self.theta, u_1, u_2, self.forward_noise)
+        new_y = self.y_motion(self.y, self.theta, u_1, u_2, self.forward_noise)
+        new_theta = self.theta_motion(self.theta, u_1, self.turn_noise)
+
+        # Set the new pose as the robot pose
+        self.set(new_x, new_y, new_theta)
 
