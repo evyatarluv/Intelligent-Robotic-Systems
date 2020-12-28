@@ -78,7 +78,7 @@ class MCL:
                 probabilities.append(landmark_prob)
 
             # Append the current particle weight
-            weights.append(np.mean(probabilities))
+            weights.append(np.prod(probabilities))
 
         return weights
 
