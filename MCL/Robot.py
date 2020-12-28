@@ -231,3 +231,4 @@ class Robot:
         prob_phi = phi_dist.pdf(phi - meas_phi)
 
         return prob_r * prob_phi
+
