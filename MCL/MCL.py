@@ -11,6 +11,7 @@ class MCL:
     Attributes:
         particles (list of Robot): The particles in the algorithm where each particle is a Robot, with length m.
         landmarks (list of tuple): List with each landmark position as (x,y) tuple.
+        location (tuple): The current estimated location of the robot as (x,y) tuple.
     """
     def __init__(self, robot, landmarks, m):
         """
@@ -22,6 +23,7 @@ class MCL:
 
         self.landmarks = deepcopy(landmarks)
         self.particles = [deepcopy(robot) for i in range(m)]
+        self.location = self.estimate_location()
 
     def localize(self, motion_commands, measurements):
         """
@@ -31,21 +33,25 @@ class MCL:
         of the current step's resampled particles is the belief for the robot's position.
         :param measurements: list, measurements of the robot to the landmarks.
         :param motion_commands: tuple, motion commands of the robot.
-        :return: list, resampled particles where each particle is a tuple of (x,y).
+        :return: lists of Robot, the sample list and the resample list
         """
 
         u_1, u_2 = motion_commands
 
-        # 1. Move particles
+        # Move particles
         [p.move(u_1, u_2) for p in self.particles]
+        sample = deepcopy(self.particles)
 
-        # 2. Compute weights for particles
+        # Compute weights for particles
         weights = self.compute_weights(measurements)
 
-        # 3. Resample particles
-        # resampled = self.resample_particles(weights)
+        # Resample particles
+        self.particles = self.resample(weights)
 
-        # return resampled
+        # Update estimated location
+        self.location = self.estimate_location()
+
+        return sample, self.particles
 
     def compute_weights(self, measurements):
 
@@ -67,8 +73,7 @@ class MCL:
             # For each landmark measure
             for landmark_index, measure in enumerate(particle_measurements):
 
-                landmark_prob = p.measurement_probability(pose=p.get_pose(),
-                                                          measurement=measurements[landmark_index],
+                landmark_prob = p.measurement_probability(measurement=measurements[landmark_index],
                                                           landmark=self.landmarks[landmark_index])
                 probabilities.append(landmark_prob)
 
@@ -77,7 +82,31 @@ class MCL:
 
         return weights
 
+    def resample(self, weights):
+        """
+        The method resample particles from the current particles according to a given weights list
+        :param weights: list, weight for each particle
+        :return: list of Robot, the resampled particle
+        """
 
+        # Convert weights to probabilities
+        weights_sum = np.sum(weights)
+        prob = [w / weights_sum for w in weights]
 
+        # Resample particles
+        resample = np.random.choice(self.particles, size=len(self.particles), p=prob, replace=True)
+
+        return resample
+
+    def estimate_location(self):
+        """
+        The method estimate the robot location according the current particles.
+        Currently, the estimation is about (x,y) position
+        :return: tuple, the estimated location of the robot
+        """
+
+        positions = [(p.x, p.y) for p in self.particles]
+
+        return tuple(np.mean(positions, axis=0))
 
 

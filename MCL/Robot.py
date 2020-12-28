@@ -6,50 +6,6 @@ from scipy.stats import norm
 from .Ploter import config_plot
 
 
-# Deterministic motion model of the robot
-def x_motion(x, theta, u_1, u_2, noise_std):
-    """
-    The motion model of x pose
-    :param x: float, current x of the robot
-    :param theta: float, current theta of the robot
-    :param u_1: float, turn command in radians
-    :param u_2: float, movement command
-    :param noise_std: float, std of the movement
-    :return: float, new x pose
-    """
-
-    noise = np.random.normal(0, noise_std)
-    return x + u_2 * np.cos(theta + u_1) + noise
-
-
-def y_motion(y, theta, u_1, u_2, noise_std):
-    """
-    The motion model of y pose
-    :param y: float, current x of the robot
-    :param theta: float, current theta of the robot
-    :param u_1: float, turn command in radians
-    :param u_2: float, movement command
-    :param noise_std: float, std of the movement
-    :return: float, new y pose
-    """
-
-    noise = np.random.normal(0, noise_std)
-    return y + u_2 * np.sin(theta + u_1) + noise
-
-
-def theta_motion(theta, u_1, noise_std):
-    """
-    The motion model of theta pose
-    :param theta: float, current theta of the robot
-    :param u_1: float, turn command in radians
-    :param noise_std: float, std of the turn
-    :return: float, new theta pose
-    """
-
-    noise = np.random.normal(0, noise_std)
-    return theta + u_1
-
-
 class Robot:
     """
     the robot class, we will use this to describe a robot
@@ -77,11 +33,6 @@ class Robot:
             self.noise_std = {'forward': 0, 'turn': 0, 'range': 0, 'bearing': 0}
         else:
             self.noise_std = copy.deepcopy(noise_std)
-
-        # Motion Model
-        self.x_motion = x_motion
-        self.y_motion = y_motion
-        self.theta_motion = theta_motion
 
         # Path
         self.path = [(self.x, self.y)]
@@ -170,10 +121,14 @@ class Robot:
         :return:
         """
 
-        # Compute the new pose of the robot
-        new_x = self.x_motion(self.x, self.theta, u_1, u_2, self.noise_std['forward'])
-        new_y = self.y_motion(self.y, self.theta, u_1, u_2, self.noise_std['forward'])
-        new_theta = self.theta_motion(self.theta, u_1, self.noise_std['turn'])
+        # Add noise to the motion commands
+        u_1 += np.random.normal(0, self.noise_std['turn'])
+        u_2 += np.random.normal(0, self.noise_std['forward'])
+
+        # Compute the new pose of the robot according the motion model
+        new_x = self.x + u_2 * np.cos(self.theta + u_1)
+        new_y = self.y + u_2 * np.sin(self.theta + u_1)
+        new_theta = self.theta + u_1
 
         # Set the new pose as the robot pose
         self.set(new_x, new_y, new_theta)
@@ -207,18 +162,17 @@ class Robot:
 
         return measurements
 
-    def measurement_probability(self, pose, measurement, landmark):
+    def measurement_probability(self, measurement, landmark):
         """
         The method compute the probability for a given measurement to be observed when being
         in a given pose.
         :param landmark: landmark position, (x,y)
-        :param pose: given pose of the robot, (x, y, theta)
-        :param measurement: real measurement, (range, bearing)
+        :param measurement: measurement the robot measure, (range, bearing)
         :return: float, probability between 0 to 1
         """
 
         # Extract values
-        x, y, theta = pose
+        x, y, theta = self.get_pose()
         r, phi = measurement
         m_x, m_y = landmark
 
