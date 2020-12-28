@@ -1,7 +1,6 @@
 from copy import deepcopy
 import numpy as np
-from MCL.Robot import Robot
-from MCL.World import World
+from tqdm import tqdm
 
 
 class MCL:
@@ -13,7 +12,7 @@ class MCL:
         particles (list of Robot): The particles in the algorithm where each particle is a Robot, with length m.
         landmarks (list of tuple): List with each landmark position as (x,y) tuple.
     """
-    def __init__(self, m, landmarks, robot):
+    def __init__(self, robot, landmarks, m):
         """
         Init MCL object
         :param m: int, amount of particles
@@ -38,15 +37,15 @@ class MCL:
         u_1, u_2 = motion_commands
 
         # 1. Move particles
-        self.particles = [p.move(u_1, u_2) for p in self.particles]
+        [p.move(u_1, u_2) for p in self.particles]
 
         # 2. Compute weights for particles
         weights = self.compute_weights(measurements)
 
         # 3. Resample particles
-        resampled = self.resample_particles(weights)
+        # resampled = self.resample_particles(weights)
 
-        return resampled
+        # return resampled
 
     def compute_weights(self, measurements):
 
@@ -59,7 +58,7 @@ class MCL:
         weights = []
 
         # For each particle
-        for p in self.particles:
+        for p in tqdm(self.particles):
 
             # Sense the landmarks and compute probabilities
             particle_measurements = p.sense(self.landmarks)

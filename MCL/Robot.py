@@ -100,14 +100,18 @@ class Robot:
         :param new_y: the new y coordinate
         :param new_orientation: the new orientation
         """
-        if new_x < 0 or new_x >= self._world_size:
-            raise Exception('X coordinate out of bound')
 
-        if new_y < 0 or new_y >= self._world_size:
-            raise Exception('Y coordinate out of bound')
+        if new_x < 0:
+            new_x = 0
 
-        if new_orientation < 0.0 or new_orientation >= 2 * np.pi:
-            raise Exception('Orientation must be in [0,2pi]')
+        if new_x > self._world_size:
+            new_x = self._world_size
+
+        if new_y < 0:
+            new_y = 0
+
+        if new_y > self._world_size:
+            new_y = self._world_size
 
         self.x = new_x
         self.y = new_y
