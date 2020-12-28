@@ -33,8 +33,8 @@ import numpy as np
 # --------------------------------------------------------------------------------------------------------
 r = Robot(init_pose=(10, 15, 0), noise_std={'forward': 6, 'turn': 0.1, 'range': 5, 'bearing': 0.3})
 w = World()
-# moves = [(0, 60), (np.pi / 3, 30), (np.pi / 4, 30), (np.pi / 4, 20), (np.pi / 4, 40)]
-moves = [(0, 60), (np.pi / 3, 30)]
+moves = [(0, 60), (np.pi / 3, 30), (np.pi / 4, 30), (np.pi / 4, 20), (np.pi / 4, 40)]
+# moves = [(0, 60), (np.pi / 3, 30)]
 mcl = MCL(r, w.landmarks, 1000)
 w.plot()
 r.plot()
@@ -42,12 +42,7 @@ r.plot()
 for u in moves:
 
     r.move(u[0], u[1])
-    sample, resample = mcl.localize(u, r.sense(w.landmarks))
-
-    for i in range(len(sample)):
-        sample[i].plot(style='particle', mycolor='black', markersize=2)
-        resample[i].plot(style='particle', mycolor='lightgrey', markersize=2)
-
+    mcl.localize(u, r.sense(w.landmarks))
     r.plot()
 
 plt.show()

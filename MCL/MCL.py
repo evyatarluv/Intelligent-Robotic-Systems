@@ -1,18 +1,22 @@
 from copy import deepcopy
 import numpy as np
 from tqdm import tqdm
+from .Robot import Robot
+import matplotlib.pyplot as plt
 
 
 class MCL:
-
     """
     A class for the implementation of MCL algorithm.
 
     Attributes:
         particles (list of Robot): The particles in the algorithm where each particle is a Robot, with length m.
         landmarks (list of tuple): List with each landmark position as (x,y) tuple.
-        location (tuple): The current estimated location of the robot as (x,y) tuple.
+        particles (list of Robot): The particles of the current step.
+        m (int): The amount of particles.
+        estimated_robot (Robot):
     """
+
     def __init__(self, robot, landmarks, m):
         """
         Init MCL object
@@ -22,8 +26,10 @@ class MCL:
         """
 
         self.landmarks = deepcopy(landmarks)
-        self.particles = [deepcopy(robot) for i in range(m)]
-        self.location = self.estimate_location()
+        self.robot_noise = deepcopy(robot.noise_std)
+        self.particles = []
+        self.estimated_robot = deepcopy(robot)
+        self.m = m
 
     def localize(self, motion_commands, measurements):
         """
@@ -37,76 +43,65 @@ class MCL:
         """
 
         u_1, u_2 = motion_commands
+        weights = []
+        self.particles = []
 
-        # Move particles
-        [p.move(u_1, u_2) for p in self.particles]
-        sample = deepcopy(self.particles)
+        for i in tqdm(range(self.m)):
 
-        # Compute weights for particles
-        weights = self.compute_weights(measurements)
+            # Create particle and move it
+            particle = deepcopy(self.estimated_robot)
+            particle.move(u_1, u_2)
 
-        # Resample particles
-        self.particles = self.resample(weights)
+            # Compute weight
+            weight = self.compute_weight(measurements, particle)
+
+            # Append particle and weight
+            self.particles.append(particle)
+            weights.append(weight)
+
+        # Resample
+        self.resample(weights)
 
         # Update estimated location
-        self.location = self.estimate_location()
+        self.update_estimation()
 
-        return sample, self.particles
+    def compute_weight(self, measurements, particle):
 
-    def compute_weights(self, measurements):
+        # Sense the landmarks and compute probabilities
+        particle_measurements = particle.sense(self.landmarks)
+        prob = []
 
-        """
-        The method compute weight for each particle according to the particle's measurements.
-        :param measurements: list, measurements of the robot regarding the landmarks
-        :return: list, weight for each particle
-        """
+        # For each landmark measure
+        for landmark_index, measure in enumerate(particle_measurements):
+            landmark_prob = particle.measurement_probability(measurement=measurements[landmark_index],
+                                                             landmark=self.landmarks[landmark_index])
+            prob.append(landmark_prob)
 
-        weights = []
+        return np.prod(prob)
 
-        # For each particle
-        for p in tqdm(self.particles):
-
-            # Sense the landmarks and compute probabilities
-            particle_measurements = p.sense(self.landmarks)
-            probabilities = []
-
-            # For each landmark measure
-            for landmark_index, measure in enumerate(particle_measurements):
-
-                landmark_prob = p.measurement_probability(measurement=measurements[landmark_index],
-                                                          landmark=self.landmarks[landmark_index])
-                probabilities.append(landmark_prob)
-
-            # Append the current particle weight
-            weights.append(np.prod(probabilities))
-
-        return weights
-
-    def resample(self, weights):
-        """
-        The method resample particles from the current particles according to a given weights list
-        :param weights: list, weight for each particle
-        :return: list of Robot, the resampled particle
-        """
+    def resample(self, weights, plot=True):
 
         # Convert weights to probabilities
         weights_sum = np.sum(weights)
         prob = [w / weights_sum for w in weights]
 
+        # Plot particles
+        if plot:
+            for p in self.particles:
+                p.plot(style='particle', mycolor='black', markersize=2)
+
         # Resample particles
-        resample = np.random.choice(self.particles, size=len(self.particles), p=prob, replace=True)
+        resample_idx = set(np.random.choice(a=len(self.particles), size=len(self.particles),
+                                            p=prob, replace=True))
+        self.particles = [self.particles[i] for i in resample_idx]
 
-        return resample
+        # Plot resampled particles
+        if plot:
+            for p in self.particles:
+                p.plot(style='particle', mycolor='lightgrey', markersize=2)
 
-    def estimate_location(self):
-        """
-        The method estimate the robot location according the current particles.
-        Currently, the estimation is about (x,y) position
-        :return: tuple, the estimated location of the robot
-        """
+    def update_estimation(self):
 
-        positions = [(p.x, p.y) for p in self.particles]
+        estimated_position = np.mean([p.get_pose() for p in self.particles], axis=0)
 
-        return tuple(np.mean(positions, axis=0))
-
-
+        self.estimated_robot = Robot(init_pose=estimated_position, noise_std=self.robot_noise)
