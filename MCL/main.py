@@ -20,9 +20,12 @@ world.plot()
 robot_1.plot()
 robot_2.plot(mycolor='r')
 
-for m in moves:
-    robot_1.move(m[0], m[1])
+for u_1, u_2 in moves:
+    robot_1.move(u_1, u_2)
+    robot_2.move(u_1, u_2)
     robot_1.plot()
+    robot_2.plot(mycolor='r')
 
-plt.plot(*(zip(*robot_1.path)), ':')
+plt.plot(*(zip(*robot_1.path)), 'b:', label='Without noise')
+plt.plot(*(zip(*robot_2.path)), 'r:', label='With noise')
 plt.show()

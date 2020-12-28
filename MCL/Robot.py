@@ -117,7 +117,7 @@ class Robot:
         """
         plotting the pose of the robot in the world
         :param markersize:
-        :param r: radius of the robot
+        :param r: float, radius of the robot
         :param mycolor: the color of the robot
         :param style: the style to plot with
         :param show: if to show or not show - used to create a new figure or not
