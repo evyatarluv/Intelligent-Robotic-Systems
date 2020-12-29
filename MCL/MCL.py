@@ -15,6 +15,7 @@ class MCL:
         particles (list of Robot): The particles in the algorithm where each particle is a Robot, with length m.
         landmarks (list of tuple): List with each landmark position as (x,y) tuple.
         particles (list of Robot): The (resampled) particles of the current step.
+        path (list of tuple): The estimated path of the robot computed by MCL.
         estimated_robot (Robot): The estimated Robot the algorithm computed to the current step, represent
                                     where the algorithm believe the robot's location.
     """
@@ -31,6 +32,7 @@ class MCL:
         self.particles = []
         self.estimated_robot = deepcopy(robot)
         self.m = m
+        self.path = [robot.get_pose()[:2]]
 
     def localize(self, motion_commands, measurements, plot=True):
         """
@@ -49,7 +51,7 @@ class MCL:
         self.particles = []
 
         # For each particle
-        for i in tqdm(range(self.m)):
+        for i in range(self.m):
 
             # Create particle and move it
             particle = deepcopy(self.estimated_robot)
@@ -123,10 +125,21 @@ class MCL:
         The method update the estimated_robot attribute which indicate the estimated location of the robot.
         :return:
         """
-
+        # todo: estimate the location using average according the particle weight
         # Compute the estimated location using mean of the particles
         estimated_position = np.mean([p.get_pose() for p in self.particles], axis=0)
         x, y, theta = estimated_position
 
         # Update the estimated robot
         self.estimated_robot.set(x, y, theta)
+
+        # Append to the path
+        self.path.append((x, y))
+
+    def get_estimated_location(self):
+        """
+        Get the estimated location of the robot
+        :return: tuple, estimated (x, y, theta) of the robot
+        """
+
+        return self.estimated_robot.get_pose()
