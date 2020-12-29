@@ -6,6 +6,13 @@ from scipy.stats import norm
 from .Ploter import config_plot
 
 
+def norm_pdf(x, mean, sd):
+    var = float(sd)**2
+    denom = (2 * np.pi * var) ** .5
+    num = np.exp(-(float(x)-float(mean))**2/(2*var))
+    return num/denom
+
+
 class Robot:
     """
     the robot class, we will use this to describe a robot
@@ -162,11 +169,10 @@ class Robot:
 
         return measurements
 
-    def measurement_probability(self, measurement, landmark, distributions=None):
+    def measurement_probability(self, measurement, landmark):
         """
         The method compute the probability for a given measurement to be observed when being
         in a given pose.
-        :param distributions: dict, distributions of each measure. For speeding up calculation time.
         :param landmark: landmark position, (x,y)
         :param measurement: measurement the robot measure, (range, bearing)
         :return: float, probability between 0 to 1
@@ -177,21 +183,13 @@ class Robot:
         r, phi = measurement
         m_x, m_y = landmark
 
-        # Create normal distributions according to the range & bearing std
-        if distributions is None:
-            r_dist = norm(0, self.noise_std['range'])
-            phi_dist = norm(0, self.noise_std['bearing'])
-        else:
-            r_dist = distributions['range']
-            phi_dist = distributions['bearing']
-
         # Compute measurement giving the pose
         meas_r = np.sqrt((m_x - x) ** 2 + (m_y - y) ** 2)
         meas_phi = np.arctan2(m_y - y, m_x - x) - theta
 
         # Compute the probability for each measure
-        prob_r = r_dist.pdf(r - meas_r)
-        prob_phi = phi_dist.pdf(phi - meas_phi)
+        prob_r = norm_pdf(r - meas_r, 0, self.noise_std['range'])
+        prob_phi = norm_pdf(phi - meas_phi, 0, self.noise_std['bearing'])
 
         return prob_r * prob_phi
 
