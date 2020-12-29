@@ -162,10 +162,11 @@ class Robot:
 
         return measurements
 
-    def measurement_probability(self, measurement, landmark):
+    def measurement_probability(self, measurement, landmark, distributions=None):
         """
         The method compute the probability for a given measurement to be observed when being
         in a given pose.
+        :param distributions: dict, distributions of each measure. For speeding up calculation time.
         :param landmark: landmark position, (x,y)
         :param measurement: measurement the robot measure, (range, bearing)
         :return: float, probability between 0 to 1
@@ -177,8 +178,12 @@ class Robot:
         m_x, m_y = landmark
 
         # Create normal distributions according to the range & bearing std
-        r_dist = norm(0, self.noise_std['range'])
-        phi_dist = norm(0, self.noise_std['bearing'])
+        if distributions is None:
+            r_dist = norm(0, self.noise_std['range'])
+            phi_dist = norm(0, self.noise_std['bearing'])
+        else:
+            r_dist = distributions['range']
+            phi_dist = distributions['bearing']
 
         # Compute measurement giving the pose
         meas_r = np.sqrt((m_x - x) ** 2 + (m_y - y) ** 2)

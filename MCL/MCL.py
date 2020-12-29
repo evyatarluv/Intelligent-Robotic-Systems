@@ -1,5 +1,6 @@
 from copy import deepcopy
 import numpy as np
+from scipy.stats import norm
 from tqdm import tqdm
 from .Robot import Robot
 import matplotlib.pyplot as plt
@@ -16,6 +17,7 @@ class MCL:
         particles (list of Robot): The (resampled) particles of the current step.
         estimated_robot (Robot): The estimated Robot the algorithm computed to the current step, represent
                                     where the algorithm believe the robot's location.
+        distributions (dict): Dict which include the error distributions of each sensor (created for speeding run time)
     """
 
     def __init__(self, robot, landmarks, m):
@@ -30,6 +32,8 @@ class MCL:
         self.particles = []
         self.estimated_robot = deepcopy(robot)
         self.m = m
+        self.distributions = {'range': norm(0, robot.noise_std['range']),
+                              'bearing': norm(0, robot.noise_std['bearing'])}
 
     def localize(self, motion_commands, measurements, plot=True):
         """
@@ -85,7 +89,8 @@ class MCL:
 
             # Compute the probability & append it
             landmark_prob = particle.measurement_probability(measurement=measurements[landmark_index],
-                                                             landmark=self.landmarks[landmark_index])
+                                                             landmark=self.landmarks[landmark_index],
+                                                             distributions=self.distributions)
             prob.append(landmark_prob)
 
         return np.prod(prob)
