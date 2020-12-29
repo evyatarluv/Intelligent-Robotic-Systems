@@ -67,6 +67,8 @@ class Robot:
         :param new_orientation: the new orientation
         """
 
+        # todo: CHANGE THE WORLD TO BE CYCLIC
+
         if new_x < 0:
             new_x = 0
 
