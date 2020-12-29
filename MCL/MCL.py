@@ -123,6 +123,9 @@ class MCL:
         :return:
         """
 
+        # Compute the estimated location using mean of the particles
         estimated_position = np.mean([p.get_pose() for p in self.particles], axis=0)
+        x, y, theta = estimated_position
 
-        self.estimated_robot.set(estimated_position)
+        # Update the estimated robot
+        self.estimated_robot.set(x, y, theta)
