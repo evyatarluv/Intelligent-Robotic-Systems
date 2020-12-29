@@ -10,11 +10,12 @@ class MCL:
     A class for the implementation of MCL algorithm.
 
     Attributes:
+        m (int): The amount of particles.
         particles (list of Robot): The particles in the algorithm where each particle is a Robot, with length m.
         landmarks (list of tuple): List with each landmark position as (x,y) tuple.
-        particles (list of Robot): The particles of the current step.
-        m (int): The amount of particles.
-        estimated_robot (Robot):
+        particles (list of Robot): The (resampled) particles of the current step.
+        estimated_robot (Robot): The estimated Robot the algorithm computed to the current step, represent
+                                    where the algorithm believe the robot's location.
     """
 
     def __init__(self, robot, landmarks, m):
@@ -26,26 +27,27 @@ class MCL:
         """
 
         self.landmarks = deepcopy(landmarks)
-        self.robot_noise = deepcopy(robot.noise_std)
         self.particles = []
         self.estimated_robot = deepcopy(robot)
         self.m = m
 
-    def localize(self, motion_commands, measurements):
+    def localize(self, motion_commands, measurements, plot=True):
         """
         This method localize the robot using MCL algorithm.
-        The method get the current motion commands u and the robot measurements (known as z).
-        The method uses the previous step particles to compute current step's list of particles. The mean
+        The method get the current motion commands (u_t) and the robot measurements (z_t).
+        The method uses the previous step computed location to compute current step's list of particles. The mean
         of the current step's resampled particles is the belief for the robot's position.
         :param measurements: list, measurements of the robot to the landmarks.
         :param motion_commands: tuple, motion commands of the robot.
-        :return: lists of Robot, the sample list and the resample list
+        :param plot: bool, indicate if to plot the sampled and resampled particles
+        :return:
         """
 
         u_1, u_2 = motion_commands
         weights = []
         self.particles = []
 
+        # For each particle
         for i in tqdm(range(self.m)):
 
             # Create particle and move it
@@ -60,12 +62,19 @@ class MCL:
             weights.append(weight)
 
         # Resample
-        self.resample(weights)
+        self.resample(weights, plot)
 
         # Update estimated location
         self.update_estimation()
 
     def compute_weight(self, measurements, particle):
+        """
+        The method get a list of measurements the real robot sense and a particle.
+        Then the method compute the weight whether the particle is consist with the measurements vector.
+        :param measurements: list, the measurements the real robot sense.
+        :param particle: Robot, the current particle we need to compute weight to it.
+        :return: float, weight of the particle
+        """
 
         # Sense the landmarks and compute probabilities
         particle_measurements = particle.sense(self.landmarks)
@@ -73,6 +82,8 @@ class MCL:
 
         # For each landmark measure
         for landmark_index, measure in enumerate(particle_measurements):
+
+            # Compute the probability & append it
             landmark_prob = particle.measurement_probability(measurement=measurements[landmark_index],
                                                              landmark=self.landmarks[landmark_index])
             prob.append(landmark_prob)
@@ -80,7 +91,13 @@ class MCL:
         return np.prod(prob)
 
     def resample(self, weights, plot=True):
-
+        """
+        The method resample particles from the attribute particles and update the attribute.
+        The resampling using a probabilities vector which calculated using the weights vector.
+        :param weights: list, weight for each particle (size m)
+        :param plot: bool, indicate if to plot the particles before and after the resampling step
+        :return:
+        """
         # Convert weights to probabilities
         weights_sum = np.sum(weights)
         prob = [w / weights_sum for w in weights]
@@ -101,7 +118,11 @@ class MCL:
                 p.plot(style='particle', mycolor='lightgrey', markersize=2)
 
     def update_estimation(self):
+        """
+        The method update the estimated_robot attribute which indicate the estimated location of the robot.
+        :return:
+        """
 
         estimated_position = np.mean([p.get_pose() for p in self.particles], axis=0)
 
-        self.estimated_robot = Robot(init_pose=estimated_position, noise_std=self.robot_noise)
+        self.estimated_robot.set(estimated_position)
