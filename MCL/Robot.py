@@ -7,6 +7,14 @@ from .Ploter import config_plot
 
 
 def norm_pdf(x, mean, sd):
+    """
+    Probability density function at x of the given (mu, sigma) normal distribution args.
+    :param x: float, value
+    :param mean: float, mu
+    :param sd: float, sigma
+    :return: probability between 0 to 1
+    """
+
     var = float(sd)**2
     denom = (2 * np.pi * var) ** .5
     num = np.exp(-(float(x)-float(mean))**2/(2*var))
