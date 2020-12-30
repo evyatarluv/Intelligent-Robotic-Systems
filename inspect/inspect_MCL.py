@@ -1,28 +1,25 @@
+from scipy import stats
+from tqdm import tqdm
+
 from MCL.World import World
 from MCL.Robot import Robot
 from MCL.MCL import MCL
 import numpy as np
 from scipy.spatial import distance
-
-# { n_particles: (mean, std)}
-particles_result = {50: (4.594732281279549, 6.842995467244805),
-                    250: (3.437128809250349, 2.214414191724139),
-                    500: (3.3586272145613716, 1.8374038878898205),
-                    1000: (3.460652485033129, 1.9068240876714986),
-                    2000: (3.378818884555366, 1.849542994370264)}
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
 
 
-def inspect_particles():
+def inspect_particles(n_repeat, n_particles):
     """
     Inspection of the influence of particle's amount on the localization error.
-    :return: list with each particle amount mean error and std
+    :return: result as a dict
     """
 
     world = World()
     moves = [(0, 60), (np.pi / 3, 30), (np.pi / 4, 30), (np.pi / 4, 20), (np.pi / 4, 40)]
     result = {}
-    n_repeat = 60
-    n_particles = [50, 250, 500, 1000, 2000]
 
     for n in n_particles:
 
@@ -42,7 +39,30 @@ def inspect_particles():
                 # Append the error
                 errors.append(distance.euclidean(mcl.path[-1], robot.path[-1]))
 
-        result[n] = (np.mean(errors), np.std(errors))
+        print('Mean Error: {}'.format(np.mean(errors)))
+        result[n] = errors
 
-    print(result)
+    pd.DataFrame.from_dict(result).to_csv('particles_results.csv', index=False)
     return result
+
+
+# inspect_particles(n_repeat=60, n_particles=[50, 250, 500, 1000, 2000])
+
+def plot_inspect_particles(results_path):
+
+    # Plot results
+    df = pd.read_csv(results_path)
+    n_particles = [50, 250, 500, 1000, 2000]
+    means = df.apply(np.mean)
+    stds = df.apply(np.std)
+    plt.errorbar(range(len(means)), means, yerr=stds / 4, capsize=2.5, fmt='-o')
+    plt.ylim((0, 7))
+    plt.xlabel('Amount of Particles')
+    plt.ylabel('MCL Error')
+    plt.title('Influence of Particles Amount on MCL Error')
+    plt.xticks(range(len(means)), [str(p) for p in n_particles])
+    plt.grid(True, axis='y')
+    plt.show()
+
+
+plot_inspect_particles('particles_results.csv')
