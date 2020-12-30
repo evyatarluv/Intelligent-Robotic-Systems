@@ -16,8 +16,7 @@ class MCL:
         landmarks (list of tuple): List with each landmark position as (x,y) tuple.
         particles (list of Robot): The (resampled) particles of the current step.
         path (list of tuple): The estimated path of the robot computed by MCL.
-        estimated_robot (Robot): The estimated Robot the algorithm computed to the current step, represent
-                                    where the algorithm believe the robot's location.
+        estimated_robot (Robot): Represent where the algorithm believe the robot's location in the current step.
     """
 
     def __init__(self, robot, landmarks, m):

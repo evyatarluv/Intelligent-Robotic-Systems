@@ -1,8 +1,6 @@
 import copy
-
 import numpy as np
 from matplotlib import pyplot as plt
-from scipy.stats import norm
 from .Ploter import config_plot
 
 
@@ -66,8 +64,6 @@ class Robot:
         :param new_y: the new y coordinate
         :param new_orientation: the new orientation
         """
-
-        # todo: CHANGE THE WORLD TO BE CYCLIC
 
         if new_x < 0:
             new_x += self._world_size
