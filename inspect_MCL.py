@@ -1,6 +1,5 @@
 from scipy import stats
 from tqdm import tqdm
-
 from MCL.World import World
 from MCL.Robot import Robot
 from MCL.MCL import MCL
