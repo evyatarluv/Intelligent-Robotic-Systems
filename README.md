@@ -1,8 +1,8 @@
 # Intelligence Robotic Systems
 
-## Monte-Carlo Localization (MCL)
+## Monte Carlo Localization (MCL)
 
-### MCL
+### MCL Directory
 
 The MCL implementation can be found in MCL directory which contains all the necessary
 classes for the MCL implementation.
@@ -11,14 +11,12 @@ Please treat the MCL folder as a module and use the `main.py` script **outside t
 At the start of the `main` script I left the `import` commands for the MCL implementation
 and an example for using the `MCL` class.
 
-### Report
+### Files Explanation
 
-The source code for the report can be found next to the required pdf file.
+1. `main.py` - Example of using the MCL class.
 
-### Inspect
+1. `MCL_Report.ipynb` - Source code of the notebook
 
-The scripts for the inspection of the MCL I did in the report.
-In the report I show only the results and in the Inspect folder you can also
-see the script themself.
+1. `inspect_MCL.py` - The inspection's script I mentions in the report.
 
 Thanks!
