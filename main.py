@@ -49,7 +49,7 @@ for u in moves:
     robot.plot()
 
 # Plot paths
-plt.plot(*(zip(*ideal_robot.path)), '-.', color='gold', label='Commands')
+# plt.plot(*(zip(*ideal_robot.path)), '-.', color='gold', label='Commands')
 plt.plot(*(zip(*mcl.path)), '-.', color='limegreen', label='MCL')
 plt.plot(*(zip(*robot.path)), '-.', color='royalblue', label='Robot')
 plt.legend(bbox_to_anchor=(0.98, 1), loc='upper left')
