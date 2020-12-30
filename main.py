@@ -2,19 +2,18 @@ from MCL.Robot import Robot
 from MCL.World import World
 from MCL.MCL import MCL
 
-from tqdm import tqdm
 import matplotlib.pyplot as plt
-from scipy.spatial import distance
 import numpy as np
-import pandas as pd
 
 # --------------------------------------------------------------------------------------------------------
 # ----------------------------Example for using the MCL class --------------------------------------------
 # --------------------------------------------------------------------------------------------------------
 world = World()
-robot = Robot(init_pose=(10, 15, 0), noise_std={'forward': 6, 'turn': 0.1, 'range': 5, 'bearing': 0.3})
+robot = Robot(init_pose=(10, 15, 0),
+              noise_std={'forward': 6, 'turn': 0.1, 'range': 5, 'bearing': 0.3})
 moves = [(0, 60), (np.pi / 3, 30), (np.pi / 4, 30), (np.pi / 4, 20), (np.pi / 4, 40)]
-mcl = MCL(robot, world.landmarks, 1000)
+n_particles = 1000
+mcl = MCL(robot, world.landmarks, n_particles)
 
 # Init plot
 world.plot()
