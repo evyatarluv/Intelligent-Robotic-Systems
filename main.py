@@ -30,5 +30,3 @@ plt.plot(*(zip(*mcl.path)), '-.', color='limegreen', label='MCL')
 plt.plot(*(zip(*robot.path)), '-.', color='royalblue', label='Robot')
 plt.legend(bbox_to_anchor=(0.98, 1), loc='upper left')
 plt.show()
-
-
