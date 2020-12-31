@@ -62,7 +62,7 @@ def plot_inspect_particles(results_path):
     plt.show()
 
 
-def inspect_weighted_average(n_repeat):
+def inspect_WA(n_repeat):
 
     world = World()
     moves = [(0, 60), (np.pi / 3, 30), (np.pi / 4, 30), (np.pi / 4, 20), (np.pi / 4, 40)]
@@ -94,6 +94,19 @@ def inspect_weighted_average(n_repeat):
     return result
 
 
+def plot_inspect_WA(results_path):
+
+    # Plot results
+    df = pd.read_csv(results_path)
+    sns.boxplot(data=df)
+    plt.ylim(0, 6)
+    plt.ylabel('MCL Error')
+    plt.xlabel('Estimation Method')
+    plt.title('MCL Estimation')
+    plt.xticks([0, 1], ['Simple Average', 'Weighted Average'])
+    plt.show()
+
 # inspect_particles(n_repeat=60, n_particles=[50, 250, 500, 1000, 2000])
 # inspect_weighted_average(100)
 # plot_inspect_particles('particles_results.csv')
+plot_inspect_WA('results/WA_results.csv')
