@@ -17,9 +17,10 @@ class MCL:
         particles (list of Robot): The (resampled) particles of the current step.
         path (list of tuple): The estimated path of the robot computed by MCL.
         estimated_robot (Robot): Represent where the algorithm believe the robot's location in the current step.
+        weighted_average (bool): If to estimate the robot position using weighted average or simple average?
     """
 
-    def __init__(self, robot, landmarks, m):
+    def __init__(self, robot, landmarks, m, weighted_average=False):
         """
         Init MCL object
         :param m: int, amount of particles
@@ -32,6 +33,7 @@ class MCL:
         self.estimated_robot = deepcopy(robot)
         self.m = m
         self.path = [robot.get_pose()[:2]]
+        self.weighted_average = weighted_average
 
     def localize(self, motion_commands, measurements, plot=True):
         """
@@ -64,10 +66,10 @@ class MCL:
             weights.append(weight)
 
         # Resample
-        self.resample(weights, plot)
+        weights = self.resample(weights, plot)
 
         # Update estimated location
-        self.update_estimation()
+        self.update_estimation(weights)
 
     def compute_weight(self, measurements, particle):
         """
@@ -119,14 +121,20 @@ class MCL:
             for p in self.particles:
                 p.plot(style='particle', mycolor='lightgrey', markersize=2)
 
-    def update_estimation(self):
+        return [weights[i] for i in resample_idx]
+
+    def update_estimation(self, weights):
         """
         The method update the estimated_robot attribute which indicate the estimated location of the robot.
         :return:
         """
-        # todo: estimate the location using average according the particle weight
+
         # Compute the estimated location using mean of the particles
-        estimated_position = np.mean([p.get_pose() for p in self.particles], axis=0)
+        if self.weighted_average:
+            estimated_position = np.average([p.get_pose() for p in self.particles], axis=0, weights=weights)
+        else:
+            estimated_position = np.mean([p.get_pose() for p in self.particles], axis=0)
+
         x, y, theta = estimated_position
 
         # Update the estimated robot

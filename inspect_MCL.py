@@ -45,8 +45,6 @@ def inspect_particles(n_repeat, n_particles):
     return result
 
 
-# inspect_particles(n_repeat=60, n_particles=[50, 250, 500, 1000, 2000])
-
 def plot_inspect_particles(results_path):
 
     # Plot results
@@ -64,4 +62,38 @@ def plot_inspect_particles(results_path):
     plt.show()
 
 
-plot_inspect_particles('particles_results.csv')
+def inspect_weighted_average(n_repeat):
+
+    world = World()
+    moves = [(0, 60), (np.pi / 3, 30), (np.pi / 4, 30), (np.pi / 4, 20), (np.pi / 4, 40)]
+    result = {}
+    weighted_average = [False, True]
+
+    for wa in weighted_average:
+
+        print('WA = {}'.format(wa))
+        errors = []
+
+        for i in range(n_repeat):
+
+            robot = Robot(init_pose=(10, 15, 0), noise_std={'forward': 6, 'turn': 0.1, 'range': 5, 'bearing': 0.3})
+            mcl = MCL(robot, world.landmarks, 1000, weighted_average=wa)
+
+            for u in moves:
+                # Move & estimate
+                robot.move(u[0], u[1])
+                mcl.localize(u, robot.sense(world.landmarks), plot=False)
+
+                # Append the error
+                errors.append(distance.euclidean(mcl.path[-1], robot.path[-1]))
+
+        print('Mean Error: {}'.format(np.mean(errors)))
+        result[str(wa)] = errors
+
+    pd.DataFrame.from_dict(result).to_csv('WA_results.csv', index=False)
+    return result
+
+
+# inspect_particles(n_repeat=60, n_particles=[50, 250, 500, 1000, 2000])
+# inspect_weighted_average(100)
+# plot_inspect_particles('particles_results.csv')
