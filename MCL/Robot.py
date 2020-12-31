@@ -65,20 +65,9 @@ class Robot:
         :param new_orientation: the new orientation
         """
 
-        if new_x < 0:
-            new_x += self._world_size
-
-        if new_x > self._world_size:
-            new_x -= self._world_size
-
-        if new_y < 0:
-            new_y += self._world_size
-
-        if new_y > self._world_size:
-            new_y -= self._world_size
-
-        self.x = new_x
-        self.y = new_y
+        # I prefer not raising error I can handle myself
+        self.x = new_x % self._world_size
+        self.y = new_y % self._world_size
         self.theta = new_orientation
 
     def plot(self, mycolor='b', style='robot', show=False, markersize=1, r=3):
