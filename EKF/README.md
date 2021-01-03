@@ -1,3 +1,5 @@
+# Extended Kalman Filter (EKF)
+
 ## Files Explanation:
 
 1. *kalman_filter.ipynb* - jupyter notebook with the answers for the exercise.
@@ -6,4 +8,4 @@
 
 1. **.py* - python scripts for loading the data, EKF implementation and figures' plots.
 
-1. *data* - data folder with the given data (for case you run my code).
+1. *data* - data folder with the given data.
