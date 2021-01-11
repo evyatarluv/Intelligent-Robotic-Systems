@@ -1,23 +1,12 @@
-# Intelligence Robotic Systems
+# Intelligent Robotic Systems
 
-## Monte Carlo Localization (MCL)
+This repos consist on different implementation for intellegence 
+systems.
 
-### MCL Directory
+The localization algorithms Extended Kalman Filter and Monte-Carlo Localization
+can be found in the EFK and MCL directories respectively.
+Each implementation contain also an report for describing the
+implementation and the results.
 
-The MCL implementation can be found in MCL directory which contains all the necessary
-classes for the MCL implementation.
-
-Please treat the MCL folder as a module and use the `main.py` script **outside the MCL directory**.
-At the start of the `main` script I left the `import` commands for the MCL implementation
-and an example for using the `MCL` class.
-
-### Files Explanation
-
-1. `main.py` - Example of using the MCL class.
-
-1. `MCL_Report.ipynb` - Source code of the notebook
-
-1. `inspect_MCL.py` - The inspection's script I mentions in the report.
-
-Thanks!
-
+You can use each implementation as a python module and import it to
+your script.  
