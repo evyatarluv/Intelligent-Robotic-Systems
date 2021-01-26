@@ -1,6 +1,6 @@
 # Intelligent Robotic Systems
 
-This repos consist on different implementation for intellegence 
+This repos consists on different implementation for intellegence 
 systems.
 
 The localization algorithms Extended Kalman Filter and Monte-Carlo Localization
