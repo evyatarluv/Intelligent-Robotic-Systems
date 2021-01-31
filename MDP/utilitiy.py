@@ -36,8 +36,35 @@ class TransitionModel:
         if not all(s in self.states for s in [target_state, current_state]):
             raise ValueError('Not legal states.')
 
+        # Assert the action enum is legal
+        if isinstance(action, int) & (action > len(self.actions)):
+            raise ValueError('Not legal action')
+
         # If the action was given as string convert it to the int
         if isinstance(action, str):
             action = self.actions.index(action.lower())
 
         return self.transition_model[action].at[current_state, target_state]
+
+
+def reward_function(goals, holes, obstacles):
+    """
+    Init the reward function.
+    :return:
+    """
+    # Init rewards
+    rewards = {i: -0.04 for i in range(1, 17)}
+
+    # Add +1 to the goals
+    for g in goals:
+        rewards[g] = 1
+
+    # Subtract -1 to holes
+    for h in holes:
+        rewards[h] = -1
+
+    # Delete the obstacle
+    for o in obstacles:
+        del rewards[o]
+
+    return rewards
