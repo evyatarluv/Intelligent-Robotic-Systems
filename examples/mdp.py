@@ -1,17 +1,17 @@
-from MDP.utilitiy import reward_function, TransitionModel
+from MDP.MDP import TransitionModel, RewardFunction
 import pickle
 
 
-def load_matrices():
+def load_matrices(directory: str):
     """
-    Load the probability matrix for each action.
+    Load the probability/reward matrix for each action.
     :return:
     """
     actions = ['north', 'east', 'south', 'west']
     matrices = []
 
     for a in actions:
-        path = '../MDP/transition_model/{}.pkl'.format(a)
+        path = '../MDP/{}/{}.pkl'.format(directory, a)
         matrices.append(pickle.load(open(path, 'rb')))
         # print('\nAction = {} \n{}'.format(a.capitalize(), matrices[-1]))
 
@@ -20,13 +20,14 @@ def load_matrices():
 
 def main():
     actions = ['north', 'east', 'south', 'west']
-    prob_matrices = load_matrices()
+    probabilities = load_matrices('transition_model')
+    rewards = load_matrices('reward_function')
 
     # Transition model & reward function
-    transition_model = TransitionModel(actions=[a[0] for a in actions],
-                                       transition_matrices=prob_matrices)
+    transition_model = TransitionModel(actions=[a[0] for a in actions], transition_matrices=probabilities)
+    reward_function = RewardFunction(actions=[a[0] for a in actions], reward_matrices=rewards)
 
-    rewards = reward_function(holes=[1, 7, 14], goals=[13], obstacles=[15])
+    print('h')
 
 
 if __name__ == '__main__':
