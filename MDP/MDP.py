@@ -1,6 +1,29 @@
-from typing import List, Dict, Union
+from typing import List, Union, Dict
 import pandas as pd
 import numpy as np
+
+
+def reward_function(goals, holes, obstacles):
+    """
+    Init the reward function.
+    :return:
+    """
+    # Init rewards
+    rewards = {i: -0.04 for i in range(1, 17)}
+
+    # Add +1 to the goals
+    for g in goals:
+        rewards[g] = 1
+
+    # Subtract -1 to holes
+    for h in holes:
+        rewards[h] = -1
+
+    # Delete the obstacle
+    for o in obstacles:
+        del rewards[o]
+
+    return rewards
 
 
 class TransitionModel:
@@ -47,24 +70,15 @@ class TransitionModel:
         return self.transition_model[action].at[current_state, target_state]
 
 
-def reward_function(goals, holes, obstacles):
-    """
-    Init the reward function.
-    :return:
-    """
-    # Init rewards
-    rewards = {i: -0.04 for i in range(1, 17)}
+class RewardFunction:
 
-    # Add +1 to the goals
-    for g in goals:
-        rewards[g] = 1
+    def __init__(self):
+        pass
 
-    # Subtract -1 to holes
-    for h in holes:
-        rewards[h] = -1
 
-    # Delete the obstacle
-    for o in obstacles:
-        del rewards[o]
+class MDP:
 
-    return rewards
+    pass
+
+
+
