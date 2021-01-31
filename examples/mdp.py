@@ -1,4 +1,4 @@
-from MDP.MDP import TransitionModel, RewardFunction
+from MDP.mdp import TransitionModel, RewardFunction
 import pickle
 
 
