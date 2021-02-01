@@ -27,8 +27,6 @@ def main():
     transition_model = TransitionModel(actions=[a[0] for a in actions], transition_matrices=probabilities)
     reward_function = RewardFunction(actions=[a[0] for a in actions], reward_matrices=rewards)
 
-    print('h')
-
 
 if __name__ == '__main__':
     main()

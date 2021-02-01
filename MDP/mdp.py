@@ -1,14 +1,17 @@
 from typing import List, Union, Dict
 import pandas as pd
 import numpy as np
+from MDP.World import World
 
 
 class TransitionModel:
     """
     The class represents a transition model for MDP algorithm.
-    """
-    def __init__(self, actions: List[str], transition_matrices: List[pd.DataFrame]):
 
+    todo: add attributes description
+    """
+
+    def __init__(self, actions: List[str], transition_matrices: List[pd.DataFrame]):
         # Assert each action have is own matrix
         assert len(actions) == len(transition_matrices), 'Actions length must be equal to matrices length'
 
@@ -39,9 +42,13 @@ class TransitionModel:
 
 
 class RewardFunction:
+    """
+    todo: add class description
+
+    todo: add attributes description
+    """
 
     def __init__(self, actions: List[str], reward_matrices: List[pd.DataFrame]):
-
         # Assert each action have is own matrix
         if len(actions) != len(reward_matrices):
             raise ValueError('The length of the actions must be equal to the length'
@@ -70,8 +77,80 @@ class RewardFunction:
 
 
 class MDP:
+    """
+    todo: add class description
+    """
 
-    pass
+    def __init__(self, world: World, transition_model: TransitionModel, reward_function: RewardFunction,
+                 gamma: float):
+        # todo: add world attribute?
+        self.transition_model: TransitionModel = transition_model
+        self.reward_function: RewardFunction = reward_function
+        self.gamma: float = gamma
+        self.states: List[int] = transition_model.states
+        self.terminal_states: List[int] = world.stateTerminals
+        self.actions: List[int] = list(range(world.nActions))
+        self.values: Dict[int, float] = {i: 0 for i in self.states}
+        self.policy: Dict[int, int] = {}
 
+    def value_iteration(self, theta: float, verbose=True) -> Dict[int, int]:
+        """
+        The method implements the value iteration algorithm to find a policy.
+        :param verbose: log prints during the algorithm
+        :param theta: threshold for value improvement
+        :return: policy as dict where the state is the key and the action is the value
+        """
 
+        values: Dict[int, float] = {i: 0 for i in self.states}
+        iterations: int = 0
 
+        while True:
+
+            delta = 0
+            iterations += 1
+
+            # Run through all the states which not terminal state
+            for state in np.setdiff1d(self.states, self.terminal_states):
+
+                old_value = values[state]
+
+                values[state] = self.optimal_value(state, values)
+
+                delta = max(delta, np.abs(values[state] - old_value))
+
+            # If the threshold was reached - break
+            if delta > theta:
+
+                break
+
+        # todo: construct policy
+
+    def optimal_value(self, current_state: int, values: Dict[int, float]) -> float:
+        """
+        The method get the current state and returns the optimal value-function, i.e., v*(s).
+        :param values: current value function
+        :param current_state: s param in the equation.
+        :return: v*(s), optimal value-function.
+        """
+
+        action_values = []
+
+        for action in self.actions:
+
+            action_values.append(self.action_value_function(current_state, action, values))
+
+        return max(action_values)
+
+    def action_value_function(self, current_state: int, action: int, values: Dict[int, float]) -> float:
+
+        action_value = 0
+
+        for target_state in self.states:
+
+            p = self.transition_model.prob(target_state, current_state, action)
+
+            R = self.reward_function.reward(current_state, action, target_state)
+
+            action_value += p * (R + self.gamma * values[target_state])
+
+        return action_value
