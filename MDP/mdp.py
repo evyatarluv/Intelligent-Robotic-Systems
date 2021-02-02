@@ -1,4 +1,4 @@
-from typing import List, Union, Dict
+from typing import List, Union, Dict, Any
 import pandas as pd
 import numpy as np
 from MDP.World import World
@@ -83,7 +83,8 @@ class MDP:
 
     def __init__(self, world: World, transition_model: TransitionModel, reward_function: RewardFunction,
                  gamma: float):
-        # todo: add world attribute?
+
+        self.world = world
         self.transition_model: TransitionModel = transition_model
         self.reward_function: RewardFunction = reward_function
         self.gamma: float = gamma
@@ -92,6 +93,14 @@ class MDP:
         self.actions: List[int] = list(range(world.nActions))
         self.values: Dict[int, float] = {i: 0 for i in self.states}
         self.policy: Dict[int, int] = {}
+
+    def plot_values(self):
+        """
+        Plot the current values on a visual gridworld
+        :return:
+        """
+
+        self.world.plot_value(self.values)
 
     def value_iteration(self, theta: float, verbose=True) -> Dict[int, int]:
         """
@@ -114,39 +123,54 @@ class MDP:
 
                 old_value = values[state]
 
-                values[state] = self.optimal_value(state, values)
+                values[state] = self._optimal_value(state, values, 'value')
 
                 delta = max(delta, np.abs(values[state] - old_value))
 
             # If the threshold was reached - break
             if delta > theta:
-
                 break
 
-        # todo: construct policy
+        # Update value function & policy
+        self.values = values
+        self.policy = {s: self._optimal_value(s, self.values, 'action') for s in self.states}
 
-    def optimal_value(self, current_state: int, values: Dict[int, float]) -> float:
+        return self.policy
+
+    def _optimal_value(self, current_state: int, values: Dict[int, float], return_type: str) -> Any:
         """
-        The method get the current state and returns the optimal value-function, i.e., v*(s).
+        The method gets the current state and returns the optimal value-function, i.e., v*(s).
+        :param return_type: determines if to return the value or action
         :param values: current value function
         :param current_state: s param in the equation.
-        :return: v*(s), optimal value-function.
+        :return: optimal value or action.
         """
 
         action_values = []
 
         for action in self.actions:
+            action_values.append(self._action_value_function(current_state, action, values))
 
-            action_values.append(self.action_value_function(current_state, action, values))
+        if return_type == 'action':
+            return np.argmax(action_values)
 
-        return max(action_values)
+        elif return_type == 'value':
+            return max(action_values)
 
-    def action_value_function(self, current_state: int, action: int, values: Dict[int, float]) -> float:
+        else:
+            raise NameError('Un-recognized return type, use `value` or `action` only')
 
+    def _action_value_function(self, current_state: int, action: int, values: Dict[int, float]) -> float:
+        """
+        The method computed the action-value function for a given state (s), action (a) and current value function.
+        :param current_state: param s in the equation
+        :param action: param a in the equation
+        :param values: param V in the equation
+        :return: action value for the given input
+        """
         action_value = 0
 
         for target_state in self.states:
-
             p = self.transition_model.prob(target_state, current_state, action)
 
             R = self.reward_function.reward(current_state, action, target_state)
@@ -154,3 +178,11 @@ class MDP:
             action_value += p * (R + self.gamma * values[target_state])
 
         return action_value
+
+
+
+
+
+
+
+

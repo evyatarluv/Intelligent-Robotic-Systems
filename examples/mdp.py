@@ -1,4 +1,5 @@
-from MDP.mdp import TransitionModel, RewardFunction
+from MDP.mdp import TransitionModel, RewardFunction, MDP
+from MDP.World import World
 import pickle
 
 
@@ -19,6 +20,8 @@ def load_matrices(directory: str):
 
 
 def main():
+
+    # load MDP example data
     actions = ['north', 'east', 'south', 'west']
     probabilities = load_matrices('transition_model')
     rewards = load_matrices('reward_function')
@@ -26,6 +29,13 @@ def main():
     # Transition model & reward function
     transition_model = TransitionModel(actions=[a[0] for a in actions], transition_matrices=probabilities)
     reward_function = RewardFunction(actions=[a[0] for a in actions], reward_matrices=rewards)
+
+    # Find optimal policy using different algorithm and parameters
+    # Value iteration algorithm
+    mdp = MDP(World(), transition_model, reward_function, gamma=0.99)
+    mdp.value_iteration(theta=10 ** -4)
+
+    mdp.plot_values()
 
 
 if __name__ == '__main__':
