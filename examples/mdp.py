@@ -36,6 +36,7 @@ def main():
     mdp.value_iteration(theta=10 ** -4)
 
     mdp.plot_values()
+    mdp.plot_policy()
 
 
 if __name__ == '__main__':

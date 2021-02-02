@@ -102,7 +102,21 @@ class MDP:
 
         self.world.plot_value(self.values)
 
-    def value_iteration(self, theta: float, verbose=True) -> Dict[int, int]:
+    def plot_policy(self):
+        """
+        Plot the current policy on the gridworld
+        :return:
+        """
+
+        policy = np.zeros(self.world.nStates)
+
+        for state, action in self.policy.items():
+
+            policy[state - 1] = action + 1
+
+        self.world.plot_policy(policy)
+
+    def value_iteration(self, theta: float, verbose: bool = True) -> Dict[int, int]:
         """
         The method implements the value iteration algorithm to find a policy.
         :param verbose: log prints during the algorithm
@@ -118,8 +132,8 @@ class MDP:
             delta = 0
             iterations += 1
 
-            # Run through all the states which not terminal state
-            for state in np.setdiff1d(self.states, self.terminal_states):
+            # Run through all the states
+            for state in self.states:
 
                 old_value = values[state]
 
@@ -128,7 +142,7 @@ class MDP:
                 delta = max(delta, np.abs(values[state] - old_value))
 
             # If the threshold was reached - break
-            if delta > theta:
+            if delta < theta:
                 break
 
         # Update value function & policy
@@ -146,10 +160,7 @@ class MDP:
         :return: optimal value or action.
         """
 
-        action_values = []
-
-        for action in self.actions:
-            action_values.append(self._action_value_function(current_state, action, values))
+        action_values = [self._action_value_function(current_state, a, values) for a in self.actions]
 
         if return_type == 'action':
             return np.argmax(action_values)
@@ -168,16 +179,18 @@ class MDP:
         :param values: param V in the equation
         :return: action value for the given input
         """
-        action_value = 0
+        R = 0
+        value_function = 0
 
         for target_state in self.states:
+
             p = self.transition_model.prob(target_state, current_state, action)
 
-            R = self.reward_function.reward(current_state, action, target_state)
+            R += p * self.reward_function.reward(current_state, action, target_state)
 
-            action_value += p * (R + self.gamma * values[target_state])
+            value_function += p * values[target_state]
 
-        return action_value
+        return R + self.gamma * value_function
 
 
 
