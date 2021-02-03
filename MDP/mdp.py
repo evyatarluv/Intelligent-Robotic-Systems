@@ -127,6 +127,10 @@ class MDP:
         values: Dict[int, float] = {i: 0 for i in self.states}
         iterations: int = 0
 
+        # Verbose
+        if verbose:
+            print('Solving MDP using value iteration algorithm...')
+
         while True:
 
             delta = 0
@@ -148,6 +152,10 @@ class MDP:
         # Update value function & policy
         self.values = values
         self.policy = {s: self._optimal_value(s, self.values, 'action') for s in self.states}
+
+        # Verbose
+        if verbose:
+            print('Convergence after {} iterations'.format(iterations))
 
         return self.policy
 

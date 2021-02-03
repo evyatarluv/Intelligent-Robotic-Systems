@@ -85,7 +85,7 @@ class World:
                     plt.text(i + 0.5, j - 0.5, str(self._truncate(valueFunction[k + 1], 3)), fontsize=20,
                              horizontalalignment='center', verticalalignment='center')
                 k += 1
-        plt.title('MDP gridworld', size=16)
+        plt.title('MDP Gridworld - Value Function', size=16)
         plt.axis("equal")
         plt.axis("off")
         plt.show()
@@ -130,6 +130,8 @@ class World:
                 plt.text(i + 0.25, j - 0.25, str(states[k]), fontsize=16, horizontalalignment='right',
                          verticalalignment='bottom')
                 k += 1
+
+        plt.title('MDP Gridworld - Policy', size=16)
         plt.axis("equal")
         plt.axis("off")
         plt.show()
