@@ -87,7 +87,7 @@ class RewardFunction:
         :return: reward matrix after updating the transition's reward
         """
 
-        rewards_matrix.applymap(lambda x: x if x == 0 else (x - old_r + new_r))
+        rewards_matrix = rewards_matrix.applymap(lambda x: x if x == 0 else (x - old_r + new_r))
 
         return rewards_matrix
 
