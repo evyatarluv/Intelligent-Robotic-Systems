@@ -34,7 +34,6 @@ def main():
     # Value iteration algorithm
     mdp = MDP(World(), transition_model, reward_function, gamma=0.99)
     mdp.value_iteration(theta=10 ** -4)
-
     mdp.plot_values()
     mdp.plot_policy()
 
