@@ -72,7 +72,7 @@ class World:
         plt.axis("off")
         plt.show()
 
-    def plot_value(self, valueFunction):
+    def plot_value(self, valueFunction, fig=None):
 
         nRows = self.nRows
         nCols = self.nCols
@@ -85,6 +85,7 @@ class World:
                     plt.text(i + 0.5, j - 0.5, str(self._truncate(valueFunction[k + 1], 3)), fontsize=20,
                              horizontalalignment='center', verticalalignment='center')
                 k += 1
+
         plt.title('MDP Gridworld - Value Function', size=16)
         plt.axis("equal")
         plt.axis("off")
