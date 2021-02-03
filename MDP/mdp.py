@@ -75,6 +75,22 @@ class RewardFunction:
 
         return self.reward_function[a].at[s, s_prime]
 
+    @staticmethod
+    def change_transition_reward(rewards_matrix: pd.DataFrame,
+                                 old_r: float, new_r: float) -> pd.DataFrame:
+        """
+        The method gets a reward function with a given reward for a transition and returns the matrix with a new reward
+        for transition.
+        :param rewards_matrix: the current reward matrix
+        :param old_r: old transition's reward
+        :param new_r: new transition reward
+        :return: reward matrix after updating the transition's reward
+        """
+
+        rewards_matrix.applymap(lambda x: x if x == 0 else (x - old_r + new_r))
+
+        return rewards_matrix
+
 
 class MDP:
     """
@@ -91,7 +107,7 @@ class MDP:
         self.states: List[int] = transition_model.states
         self.terminal_states: List[int] = world.stateTerminals
         self.actions: List[int] = list(range(world.nActions))
-        self.values: Dict[int, float] = {i: 0 for i in self.states}
+        self.value_function: Dict[int, float] = {i: 0 for i in self.states}
         self.policy: Dict[int, int] = {}
 
     def plot_values(self):
@@ -100,7 +116,7 @@ class MDP:
         :return:
         """
 
-        self.world.plot_value(self.values)
+        self.world.plot_value(self.value_function)
 
     def plot_policy(self):
         """
@@ -116,7 +132,7 @@ class MDP:
 
         self.world.plot_policy(policy)
 
-    def value_iteration(self, theta: float, verbose: bool = True) -> Dict[int, int]:
+    def value_iteration(self, theta: float, verbose: bool = True):
         """
         The method implements the value iteration algorithm to find a policy.
         :param verbose: log prints during the algorithm
@@ -149,15 +165,13 @@ class MDP:
             if delta < theta:
                 break
 
-        # Update value function & policy
-        self.values = values
-        self.policy = {s: self._optimal_value(s, self.values, 'action') for s in self.states}
-
         # Verbose
         if verbose:
             print('Convergence after {} iterations'.format(iterations))
 
-        return self.policy
+        # Update value function & policy
+        self.value_function = values
+        self.policy = {s: self._optimal_value(s, self.value_function, 'action') for s in self.states}
 
     def _optimal_value(self, current_state: int, values: Dict[int, float], return_type: str) -> Any:
         """
