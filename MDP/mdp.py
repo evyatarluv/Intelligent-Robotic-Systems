@@ -133,10 +133,10 @@ class MDP:
 
     def value_iteration(self, theta: float, verbose: bool = True):
         """
-        The method implements the value iteration algorithm to find a policy.
+        The method implements the value iteration algorithm to find an optimal policy.
         :param verbose: log prints during the algorithm
         :param theta: threshold for value improvement
-        :return: policy as dict where the state is the key and the action is the value
+        :return:
         """
 
         value_function: Dict[int, float] = {i: 0 for i in self.states}
@@ -218,8 +218,9 @@ class MDP:
 
     def policy_iteration(self, theta: float, verbose: bool = True):
         """
-
-        :param theta:
+        The method implements the policy iteration algorithm to find an optimal policy.
+        :param verbose: if to print log messages
+        :param theta: threshold for value function improvement
         :return:
         """
 
@@ -314,8 +315,8 @@ class MDP:
                   value_function: Dict[int, float], new_value_function: Dict[int, float], theta: float) -> bool:
 
         # Assert all states in policy & value function
-        assert len(policy) == len(new_policy) == self.states, 'Missing states in policies'
-        assert len(value_function) == len(new_value_function) == self.states, 'Missing states in value functions'
+        assert len(policy) == len(new_policy) == len(self.states), 'Missing states in policies'
+        assert len(value_function) == len(new_value_function) == len(self.states), 'Missing states in value functions'
 
         # Look for changes in policy
         for s in policy.keys():
