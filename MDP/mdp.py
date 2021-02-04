@@ -6,9 +6,19 @@ from MDP.World import World
 
 class TransitionModel:
     """
-    The class represents a transition model for MDP algorithm.
+    The class represents a transition model for MDP.
 
-    todo: add attributes description
+    Attributes:
+        actions (list[str]):
+            list with all the optional actions in the MDP.
+
+        states (list[int]):
+            list with all the reachable states in the MDP.
+
+        transition_model (dict[int, DataFrame]):
+            dict with probability matrix as value and actions as key.
+
+
     """
 
     def __init__(self, actions: List[str], transition_matrices: List[pd.DataFrame]):
@@ -43,9 +53,17 @@ class TransitionModel:
 
 class RewardFunction:
     """
-    todo: add class description
+    The class represents a reward function for MDP.
 
-    todo: add attributes description
+    Attributes:
+        actions (list[str]):
+            list with all the optional actions in the MDP.
+
+        states (list[int]):
+            list with all the reachable states in the MDP.
+
+        reward_function (dict[int, DataFrame]):
+            dict with reward matrix as value and actions as key.
     """
 
     def __init__(self, actions: List[str], reward_matrices: List[pd.DataFrame]):
@@ -94,7 +112,36 @@ class RewardFunction:
 
 class MDP:
     """
-    todo: add class description
+    Class which represent a gridworld MDP problem.
+
+    Attributes:
+        world (World):
+            The world the agent being in and try to find the optimal policy.
+
+        transition_model (TransitionModel):
+            transition model object, represents the transition probability of the agent in the world.
+
+        reward_function (RewardFunction):
+            reward function object, represents the reward function of the agent in the world.
+
+        gamma (float):
+            discount factor for future rewards.
+
+        states (list[int]):
+            list with all the reachable states in the world.
+
+        terminal_states (list[int]):
+            list with all the terminal states in the world.
+
+        actions (list[int]):
+            list with all the possible actions in the world.
+
+        value_function (dict[int, float]):
+            dict with states as keys and values as values for representing the value function of the gridworld.
+
+        policy (dict[int, int]):
+            dict with states as keys and actions as values fo representing policy of the agent in the gridworld.
+
     """
 
     def __init__(self, world: World, transition_model: TransitionModel, reward_function: RewardFunction,
