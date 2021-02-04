@@ -313,7 +313,16 @@ class MDP:
 
     def _converge(self, policy: Dict[int, int], new_policy: Dict[int, int],
                   value_function: Dict[int, float], new_value_function: Dict[int, float], theta: float) -> bool:
-
+        """
+        The method check if the policy iteration algorithm converge.
+        Both policy and value function need to converge in order to determine algorithm converge.
+        :param policy: policy before the current iteration
+        :param new_policy: policy after current iteration
+        :param value_function: values before current iteration
+        :param new_value_function: values after current iteration
+        :param theta: threshold for values converge
+        :return: bool answer if the algorithm converge
+        """
         # Assert all states in policy & value function
         assert len(policy) == len(new_policy) == len(self.states), 'Missing states in policies'
         assert len(value_function) == len(new_value_function) == len(self.states), 'Missing states in value functions'
