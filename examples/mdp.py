@@ -48,10 +48,10 @@ def main():
     # mdp.plot_policy()
 
     # Section e
-    mdp = MDP(World(), transition_model, reward_function, gamma=0.9)
-    mdp.policy_iteration(theta=10 ** -4)
-    mdp.plot_values()
-    mdp.plot_policy()
+    # mdp = MDP(World(), transition_model, reward_function, gamma=0.9)
+    # mdp.policy_iteration(theta=10 ** -4)
+    # mdp.plot_values()
+    # mdp.plot_policy()
 
 
 if __name__ == '__main__':
