@@ -238,12 +238,6 @@ class MDP:
 
             iterations += 1
 
-            # plot
-            self.policy = policy
-            self.value_function = value_function
-            self.plot_policy()
-            self.plot_values()
-
             # Policy evaluation
             new_value_function = self._policy_evaluation(policy, theta)
 
