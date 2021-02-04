@@ -140,7 +140,7 @@ class MDP:
         :return: policy as dict where the state is the key and the action is the value
         """
 
-        values: Dict[int, float] = {i: 0 for i in self.states}
+        value_function: Dict[int, float] = {i: 0 for i in self.states}
         iterations: int = 0
 
         # Verbose
@@ -155,11 +155,11 @@ class MDP:
             # Run through all the states
             for state in self.states:
 
-                old_value = values[state]
+                old_value = value_function[state]
 
-                values[state] = self._optimal_value(state, values, 'value')
+                value_function[state] = self._optimal_value_function(state, value_function, 'value')
 
-                delta = max(delta, np.abs(values[state] - old_value))
+                delta = max(delta, np.abs(value_function[state] - old_value))
 
             # If the threshold was reached - break
             if delta < theta:
@@ -170,10 +170,10 @@ class MDP:
             print('Convergence after {} iterations'.format(iterations))
 
         # Update value function & policy
-        self.value_function = values
-        self.policy = {s: self._optimal_value(s, self.value_function, 'action') for s in self.states}
+        self.value_function = value_function
+        self.policy = {s: self._optimal_value_function(s, self.value_function, 'action') for s in self.states}
 
-    def _optimal_value(self, current_state: int, values: Dict[int, float], return_type: str) -> Any:
+    def _optimal_value_function(self, current_state: int, values: Dict[int, float], return_type: str) -> Any:
         """
         The method gets the current state and returns the optimal value-function, i.e., v*(s).
         :param return_type: determines if to return the value or action
@@ -193,27 +193,35 @@ class MDP:
         else:
             raise NameError('Un-recognized return type, use `value` or `action` only')
 
-    def _action_value_function(self, current_state: int, action: int, values: Dict[int, float]) -> float:
+    def _action_value_function(self, current_state: int, action: int,
+                               value_function: Dict[int, float]) -> float:
         """
         The method computed the action-value function for a given state (s), action (a) and current value function.
+        The method returns q(s,a).
         :param current_state: param s in the equation
         :param action: param a in the equation
-        :param values: param V in the equation
+        :param value_function: param V in the equation
         :return: action value for the given input
         """
-        R = 0
-        value_function = 0
+
+        action_value = 0
 
         for target_state in self.states:
 
+            # Compute p(s'|s, a)
             p = self.transition_model.prob(target_state, current_state, action)
 
-            R += p * self.reward_function.reward(current_state, action, target_state)
+            # Compute r(s, a, s')
+            r = self.reward_function.reward(current_state, action, target_state)
 
-            value_function += p * values[target_state]
+            # Update q(s, a)
+            action_value += p * (r + self.gamma * value_function[target_state])
 
-        return R + self.gamma * value_function
+        return action_value
 
+    def _policy_evaluation(self, policy, theta):
+
+        value_function = {s: 0 for s in self.states}
 
 
 
