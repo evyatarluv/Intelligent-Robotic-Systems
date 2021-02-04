@@ -127,7 +127,6 @@ class MDP:
         policy = np.zeros(self.world.nStates)
 
         for state, action in self.policy.items():
-
             policy[state - 1] = action + 1
 
         self.world.plot_policy(policy)
@@ -154,7 +153,6 @@ class MDP:
 
             # Run through all the states
             for state in self.states:
-
                 old_value = value_function[state]
 
                 value_function[state] = self._optimal_value_function(state, value_function, 'value')
@@ -207,7 +205,6 @@ class MDP:
         action_value = 0
 
         for target_state in self.states:
-
             # Compute p(s'|s, a)
             p = self.transition_model.prob(target_state, current_state, action)
 
@@ -220,12 +217,34 @@ class MDP:
         return action_value
 
     def _policy_evaluation(self, policy, theta):
+        """
+        The method estimate the value function for a given policy.
+        Implements the iterative policy evaluation.
+        :param policy:
+        :param theta:
+        :return:
+        """
 
+        # Init arbitrarily value function
         value_function = {s: 0 for s in self.states}
 
+        # Evaluate policy until converge
+        while True:
 
+            delta = 0
 
+            for s in self.states:
 
+                old_value = value_function[s]
 
+                value_function[s] = self._action_value_function(s, policy[s], value_function)
+
+                delta = max(delta, np.abs(value_function[s] - old_value))
+
+            # If the threshold was reached - break
+            if delta < theta:
+                break
+
+        return value_function
 
 
