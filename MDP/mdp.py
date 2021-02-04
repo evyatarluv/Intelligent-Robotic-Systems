@@ -216,13 +216,55 @@ class MDP:
 
         return action_value
 
-    def _policy_evaluation(self, policy, theta):
+    def policy_iteration(self, theta: float, verbose: bool = True):
+        """
+
+        :param theta:
+        :return:
+        """
+
+        # Init arbitrarily policy & value function
+        policy = {s: np.random.randint(0, len(self.actions)) for s in self.states}
+        value_function = {s: 0 for s in self.states}
+        iterations = 0
+
+        # Verbose
+        if verbose:
+            print('Solving MDP using policy iteration algorithm...')
+
+        # Policy iteration
+        while True:
+
+            iterations += 1
+
+            # Policy evaluation
+            new_value_function = self._policy_evaluation(policy, theta)
+
+            # Policy Improvement
+            new_policy = self._policy_improvement(value_function)
+
+            # Break if policy & value function converge
+            if self._converge(policy, new_policy, value_function, new_value_function, theta):
+                break
+
+            else:
+                policy = new_policy
+                value_function = new_value_function
+
+        # Verbose
+        if verbose:
+            print('Convergence after {} iterations'.format(iterations))
+
+        self.policy = new_policy
+        self.value_function = new_value_function
+
+    def _policy_evaluation(self, policy: Dict[int, int], theta: float) -> Dict[int, int]:
         """
         The method estimate the value function for a given policy.
         Implements the iterative policy evaluation.
-        :param policy:
-        :param theta:
-        :return:
+        :param policy: dict which represent the current policy
+        :param theta: threshold for breaking the policy evaluation loop
+        :return: value function v(s)
         """
 
         # Init arbitrarily value function
@@ -246,5 +288,52 @@ class MDP:
                 break
 
         return value_function
+
+    def _policy_improvement(self, value_function: Dict[int, float]) -> Dict[int, int]:
+        """
+        The method gets a value function, v(s), and use it to improve the policy
+        following a greedy strategy.
+        :param value_function: value for each state.
+        :return: dict with action for each state
+        """
+        # Init policy
+        policy = {}
+
+        # Improve policy according given value function
+        for s in self.states:
+
+            # Get q(s,a) for each a in actions
+            actions_values = [self._action_value_function(s, a, value_function) for a in self.actions]
+
+            # Update policy for state s
+            policy[s] = int(np.argmax(actions_values))
+
+        return policy
+
+    def _converge(self, policy: Dict[int, int], new_policy: Dict[int, int],
+                  value_function: Dict[int, float], new_value_function: Dict[int, float], theta: float) -> bool:
+
+        # Assert all states in policy & value function
+        assert len(policy) == len(new_policy) == self.states, 'Missing states in policies'
+        assert len(value_function) == len(new_value_function) == self.states, 'Missing states in value functions'
+
+        # Look for changes in policy
+        for s in policy.keys():
+
+            if policy[s] != new_policy[s]:
+
+                return False
+
+        # Look for changes in value function
+        for s in value_function.keys():
+
+            if np.abs(value_function[s] - new_value_function[s]) > theta:
+
+                return False
+
+        # If you pass all checks return True
+        return True
+
+
 
 
