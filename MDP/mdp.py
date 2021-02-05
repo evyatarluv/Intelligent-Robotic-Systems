@@ -289,7 +289,7 @@ class MDP:
             new_value_function = self._policy_evaluation(policy, theta)
 
             # Policy Improvement
-            new_policy = self._policy_improvement(value_function)
+            new_policy = self._policy_improvement(new_value_function)
 
             # Break if policy & value function converge
             if self._converge(policy, new_policy, value_function, new_value_function):
