@@ -292,7 +292,7 @@ class MDP:
             new_policy = self._policy_improvement(value_function)
 
             # Break if policy & value function converge
-            if self._converge(policy, new_policy, value_function, new_value_function, theta):
+            if self._converge(policy, new_policy, value_function, new_value_function):
                 break
 
             else:
@@ -359,7 +359,7 @@ class MDP:
         return policy
 
     def _converge(self, policy: Dict[int, int], new_policy: Dict[int, int],
-                  value_function: Dict[int, float], new_value_function: Dict[int, float], theta: float) -> bool:
+                  value_function: Dict[int, float], new_value_function: Dict[int, float]) -> bool:
         """
         The method check if the policy iteration algorithm converge.
         Both policy and value function need to converge in order to determine algorithm converge.
@@ -367,7 +367,6 @@ class MDP:
         :param new_policy: policy after current iteration
         :param value_function: values before current iteration
         :param new_value_function: values after current iteration
-        :param theta: threshold for values converge
         :return: bool answer if the algorithm converge
         """
         # Assert all states in policy & value function
@@ -384,7 +383,7 @@ class MDP:
         # Look for changes in value function
         for s in value_function.keys():
 
-            if np.abs(value_function[s] - new_value_function[s]) > theta:
+            if value_function[s] != new_value_function[s]:
 
                 return False
 

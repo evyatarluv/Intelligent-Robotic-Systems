@@ -2,6 +2,7 @@ from MDP.mdp import TransitionModel, RewardFunction, MDP
 from MDP.World import World
 import pickle
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 def load_matrices(directory: str):
@@ -33,7 +34,7 @@ def main():
 
     # Find optimal policy using different algorithm and parameters
     # Value iteration algorithm
-    # mdp = MDP(World(), transition_model, reward_function, gamma=0.9)
+    # mdp = MDP(World(), transition_model, reward_function, gamma=0.99)
     # mdp.value_iteration(theta=10 ** -4)
     # mdp.plot_values()
     # mdp.plot_policy()
@@ -48,6 +49,7 @@ def main():
     # mdp.plot_policy()
 
     # Section e
+    np.random.seed(12345)
     mdp = MDP(World(), transition_model, reward_function, gamma=0.9)
     mdp.policy_iteration(theta=10 ** -4)
     mdp.plot_values()
