@@ -34,22 +34,12 @@ def main():
 
     # Find optimal policy using different algorithm and parameters
     # Value iteration algorithm
-    # mdp = MDP(World(), transition_model, reward_function, gamma=0.99)
-    # mdp.value_iteration(theta=10 ** -4)
-    # mdp.plot_values()
-    # mdp.plot_policy()
+    mdp = MDP(World(), transition_model, reward_function, gamma=0.99)
+    mdp.value_iteration(theta=10 ** -4)
+    mdp.plot_values()
+    mdp.plot_policy()
 
-    # Section d
-    # r = -0.02
-    # new_reward_matrices = [RewardFunction.change_transition_reward(m, -0.04, -0.02) for m in rewards]
-    # new_reward_function = RewardFunction(actions=[a[0] for a in actions], reward_matrices=new_reward_matrices)
-    # mdp = MDP(World(), transition_model, new_reward_function, gamma=0.9)
-    # mdp.value_iteration(theta=10 ** -4)
-    # mdp.plot_values()
-    # mdp.plot_policy()
-
-    # Section e
-    np.random.seed(12345)
+    # Policy iteration
     mdp = MDP(World(), transition_model, reward_function, gamma=0.9)
     mdp.policy_iteration(theta=10 ** -4)
     mdp.plot_values()
