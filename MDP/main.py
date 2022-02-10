@@ -12,7 +12,8 @@ transition_model = TransitionModel(actions = [a[0] for a in actions],
 
 # Load reward function
 path = 'reward_function/{}.pkl'
-reward_matrices = [pickle.load(open(path.format(a), 'rb')) for a in actions]
+reward_function = RewardFunction(actions = [a[0] for a in actions],
+                                 reward_matrices=[pickle.load(open(path.format(a), 'rb')) for a in actions])
 
 # Create a MDP instance
 mdp = MDP(World(), transition_model, reward_function, gamma=0.99)
